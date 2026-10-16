@@ -1,11 +1,11 @@
 # BergPro – testrapport
 
-Körd: 2026-10-16 18:44 (UTC) mot `index.html` byggd från `src/`. Endast tester som faktiskt har körts redovisas.
+Körd: 2026-10-16 18:52 (UTC) mot `index.html` byggd från `src/`. Endast tester som faktiskt har körts redovisas.
 
 | Svit | Miljö | Resultat |
 |---|---|---|
 | Självtest (beräkningsmotor, enheter, lagring) | Node v22.22.0 och i appen (Mer → Självtest) | **141/141** |
-| Gränssnitt, dator | Chromium (Playwright), `file://`, 320–1200 px | **129/129 godkända** |
+| Gränssnitt, dator | Chromium (Playwright), `file://`, 320–1200 px | **131/131 godkända** |
 | Gränssnitt, Android-emulering | Chromium med Android-profiler (pekskärm, mobil-UA, DPR) | **92/92 godkända** |
 
 ## Vad emuleringen inte ersätter
@@ -155,7 +155,7 @@ Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium
 - ✅ Äldre poster från egna modellen visas med aktuella etiketter och 3 siffror
 - ✅ Egen modell: K efter bergart enligt anteckningen (gnejs 22, granit 25, kvartsit 27, skiffer 18, alunskiffer 15)
 
-## 2. Gränssnitt på dator (129 kontroller)
+## 2. Gränssnitt på dator (131 kontroller)
 
 - ✅ start renderar sökfält
 - ✅ modellen är stjärnmärkt från start
@@ -166,6 +166,8 @@ Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium
 - ✅ sökträff öppnar kalkylator
 - ✅ sökning kvar efter tillbaka
 - ✅ alla 12 kategorier öppnas
+- ✅ vy #/help renderar
+- ✅ ingen h-scroll #/help
 - ✅ vy #/formulas renderar
 - ✅ ingen h-scroll #/formulas
 - ✅ vy #/units renderar
@@ -407,9 +409,9 @@ Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium
 
 **Moto G4 (4× långsammare CPU)**
 
-- ✅ start till användbar sida: 350 ms
-- ✅ sökresultat efter inmatning: 106 ms
-- ✅ mätserie med 5000 värden (tabell + diagram): 476 ms
+- ✅ start till användbar sida: 354 ms
+- ✅ sökresultat efter inmatning: 99 ms
+- ✅ mätserie med 5000 värden (tabell + diagram): 387 ms
 - ✅ tabellen anger att 200 av 5000 visas
 
 ## Kvar att testa på en riktig Android-telefon

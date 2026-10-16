@@ -36,7 +36,7 @@ Källhänvisningen har preciserats för 61 formler (version 1.1). Innehållsliga
 
 ## Formler per kategori
 
-### Snabbkalkylator
+### Miniräknare
 
 #### Medelhastighet — `speed_avg` (v1.1)
 
@@ -250,7 +250,7 @@ Källhänvisningen har preciserats för 61 formler (version 1.1). Innehållsliga
 | Kalkylator | `mohr` |
 | Tester som anropar kalkylatorn | 8 |
 
-### Bergklassificering
+### Bergkvalitet och sprickor
 
 #### RQD – Rock Quality Designation — `rqd` (v1.1)
 
@@ -297,7 +297,7 @@ Källhänvisningen har preciserats för 61 formler (version 1.1). Innehållsliga
 | Kalkylator | `frac_spacing` |
 | Tester som anropar kalkylatorn | 1 |
 
-### Geometri och volym
+### Volym, area och massa
 
 #### Rektangulär area — `area_rect` (v1.1)
 
@@ -633,7 +633,7 @@ Källhänvisningen har preciserats för 61 formler (version 1.1). Innehållsliga
 | Kalkylator | `sine_rms` |
 | Tester som anropar kalkylatorn | 1 |
 
-### Mätning och signalanalys
+### Mätserier och statistik
 
 #### Aritmetiskt medelvärde — `mean` (v1.1)
 
@@ -770,7 +770,7 @@ Källhänvisningen har preciserats för 61 formler (version 1.1). Innehållsliga
 | Kalkylator | `series` |
 | Tester som anropar kalkylatorn | 2 |
 
-### Luftstötvåg och miljömätning
+### Luftstötvåg och ljud
 
 #### Nivå (dB) från tryck — `spl_p` (v1.1)
 
@@ -847,7 +847,7 @@ Källhänvisningen har preciserats för 61 formler (version 1.1). Innehållsliga
 | Kalkylator | `dist_delay` |
 | Tester som anropar kalkylatorn | 1 |
 
-### Ekonomi och kostnader
+### Kostnader
 
 #### Total kostnad — `total_cost` (v1.1)
 
@@ -971,7 +971,7 @@ Källhänvisningen har preciserats för 61 formler (version 1.1). Innehållsliga
 | Kalkylator | – |
 | Tester som anropar kalkylatorn | 0 |
 
-### Egna modeller
+### Egna modeller (ej verifierade)
 
 #### v = K / Bᵃ · lᵇ (egen modell, ej verifierad) — `blast_v` (v1.0)
 

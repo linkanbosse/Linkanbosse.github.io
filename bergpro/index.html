@@ -281,6 +281,14 @@ details.adv[open]{padding-bottom:12px}
 details.adv>summary{font-weight:650}
 details.more>summary{min-height:36px;font-weight:650}
 
+/* Klarspråk och struktur */
+.plain{font-size:1.05rem;margin:4px 0 2px}
+.helpbar{display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--panel2);color:var(--text);text-decoration:none;min-height:48px}
+.helpbar:hover{border-color:var(--accent);text-decoration:none}
+.helpbar svg{color:var(--accent)}
+.howto{margin:0;padding-left:1.3em}
+.howto li{margin:8px 0}
+
 </style>
 </head>
 <body>
@@ -781,19 +789,19 @@ const Store = {
 
 /* ---------- Kategorier ---------- */
 const CATS = [
-  { id: 'quick', n: 'Snabbkalkylator', ic: 'calc', d: 'Skriv ett uttryck eller öppna de vanligaste räknarna.', syn: ['miniräknare', 'räknare', 'uttryck'] },
-  { id: 'rockmech', n: 'Bergmekanik', ic: 'rock', d: 'Spänning, töjning, moduler, tunghet, effektiv spänning och Mohr–Coulomb.', syn: ['hållfasthet', 'spänning', 'elasticitet'] },
-  { id: 'class', n: 'Bergklassificering', ic: 'layers', d: 'RQD, sprickfrekvens, sprickavstånd och fältanteckningar.', syn: ['rqd', 'spricka', 'kärna'] },
-  { id: 'geo', n: 'Geometri och volym', ic: 'geo', d: 'Area, omkrets, volym, tvärsektioner, massa och densitet.', syn: ['yta', 'kubik', 'm3'] },
-  { id: 'drill', n: 'Borrning och produktion', ic: 'drill', d: 'Borrmeter, arbetstid, stillestånd, bränsle och produktionsuppföljning.', syn: ['borrmeter', 'produktion', 'maskin'] },
-  { id: 'vib', n: 'Vibrationer', ic: 'wave', d: 'Frekvens, period, vinkelhastighet, förskjutning, hastighet och acceleration.', syn: ['svängning', 'hertz', 'mm/s'] },
-  { id: 'meas', n: 'Mätning och signalanalys', ic: 'chart', d: 'Medelvärde, RMS, topp, standardavvikelse, mätavvikelse och osäkerhet.', syn: ['statistik', 'rms', 'mätserie'] },
-  { id: 'air', n: 'Luftstötvåg och miljömätning', ic: 'wind', d: 'Mätjournal samt tryck, ljudnivå (dB) och ljudhastighet.', syn: ['luftstöt', 'ljudtrycksnivå', 'decibel', 'tryck'] },
-  { id: 'econ', n: 'Ekonomi och kostnader', ic: 'coin', d: 'Kostnad per meter, m³ och timme, budgetavvikelse och bränslekostnad.', syn: ['budget', 'kostnad', 'kr'] },
-  { id: 'units', n: 'Enhetsomvandling', ic: 'swap', d: 'Längd, area, volym, massa, densitet, tryck, hastighet, tid, effekt, energi.', syn: ['omvandla', 'konvertera', 'enhet'] },
-  { id: 'formulas', n: 'Formelsamling', ic: 'book', d: 'Sökbart register med antaganden, giltighetsområde, källa och status.', syn: ['formler', 'register'] },
-  { id: 'std', n: 'Standarder och dokumentation', ic: 'shield', d: 'Källregister, riskanteckningar, antaganden, granskning och mätjournaler.', syn: ['sprängteknik', 'dokumentation', 'källor', 'risk'] },
-  { id: 'model', n: 'Egna modeller', ic: 'pulse', d: 'Egna, ej verifierade modeller från dina anteckningar. Du anger alla värden själv.', syn: ['egen modell', 'anteckningar', 'ej verifierad'] },
+  { id: 'quick', grp: 'tools', n: 'Miniräknare', ic: 'calc', d: 'Räkna fritt med ett uttryck, t.ex. 2*(3+4), eller medelhastighet.', syn: ['miniräknare', 'räknare', 'uttryck'] },
+  { id: 'rockmech', grp: 'before', n: 'Bergmekanik', ic: 'rock', d: 'Spänning, töjning och hållfasthet – främst när du tolkar provresultat eller jämför bergets styvhet.', syn: ['hållfasthet', 'spänning', 'elasticitet'] },
+  { id: 'class', grp: 'before', n: 'Bergkvalitet och sprickor', ic: 'layers', d: 'RQD från borrkärna, antal sprickor per meter och anteckningar om berget på plats.', syn: ['rqd', 'spricka', 'kärna'] },
+  { id: 'geo', grp: 'before', n: 'Volym, area och massa', ic: 'geo', d: 'Hur många m³ och ton? Rätblock, cylinder och borrhål, tvärsektioner längs en sträcka.', syn: ['yta', 'kubik', 'm3'] },
+  { id: 'drill', grp: 'follow', n: 'Borrning och produktion', ic: 'drill', d: 'Borrmeter, borrtakt, arbetstid, stillestånd, bränsle och plan mot utfall.', syn: ['borrmeter', 'produktion', 'maskin'] },
+  { id: 'vib', grp: 'measure', n: 'Vibrationer', ic: 'wave', d: 'Frekvens och omräkning mellan förskjutning (mm), hastighet (mm/s) och acceleration.', syn: ['svängning', 'hertz', 'mm/s'] },
+  { id: 'meas', grp: 'measure', n: 'Mätserier och statistik', ic: 'chart', d: 'Medel, största värde, RMS och spridning för en serie mätvärden – och mätosäkerhet.', syn: ['statistik', 'rms', 'mätserie'] },
+  { id: 'air', grp: 'measure', n: 'Luftstötvåg och ljud', ic: 'wind', d: 'Mätjournal för dina mätningar, omräkning tryck ↔ dB och ljudets gångtid.', syn: ['luftstöt', 'ljudtrycksnivå', 'decibel', 'tryck'] },
+  { id: 'econ', grp: 'follow', n: 'Kostnader', ic: 'coin', d: 'Kostnad per meter, per m³ och per timme, budgetavvikelse och bränslekostnad.', syn: ['budget', 'kostnad', 'kr'] },
+  { id: 'units', grp: 'tools', n: 'Enhetsomvandling', ic: 'swap', d: 'Omvandla längd, volym, vikt, tryck, energi m.m. – t.ex. bar till kPa eller tum till mm.', syn: ['omvandla', 'konvertera', 'enhet'] },
+  { id: 'formulas', grp: 'tools', n: 'Formelsamling', ic: 'book', d: 'Alla formler med förklaring, enheter, källa och hur säker formeln är.', syn: ['formler', 'register'] },
+  { id: 'std', grp: 'tools', n: 'Dokumentation och källor', ic: 'shield', d: 'Egna källor och standarder, riskanteckningar, antaganden och granskning.', syn: ['sprängteknik', 'dokumentation', 'källor', 'risk'] },
+  { id: 'model', grp: 'before', n: 'Egna modeller (ej verifierade)', ic: 'pulse', d: 'Din handskrivna modell för v och λ/v. Ej verifierad – läs statusrutan på sidan innan du använder resultatet.', syn: ['egen modell', 'anteckningar', 'ej verifierad'] },
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
 
@@ -1329,6 +1337,75 @@ const REVIEW = {
   blast_t: { note: 'EJ VERIFIERAD. Endast kvoten kontrollerad. Anteckningens λ-exempel är inkonsekvent (40 % av 2 m = 0,8 m, inte 1,6 m) och avgörs inte av appen. Säkerhetsgranskning 2026-10-14: t benämns inte fördröjning, söks inte på tändsekvens och anges som ”inte ett tändintervall”.' },
 };
 
+
+/* ---------- Klarspråk: när använder jag kalkylatorn? (visas i listor och överst på kalkylatorn) ---------- */
+const GROUPS = [
+  ['before', 'Före sprängning', 'Volymer, bergkvalitet och underlag inför salvan'],
+  ['measure', 'Mätning', 'Vibrationer, luftstöt och mätserier'],
+  ['follow', 'Uppföljning', 'Produktion, kostnader och projekt'],
+  ['tools', 'Verktyg och dokument', 'Miniräknare, enheter, formler och källor'],
+];
+const PLAIN = {
+  area_rect: 'Area av en rektangulär yta, t.ex. en salvas yta eller en vägg. Ange bredd och höjd.',
+  area_tri: 'Area av en trekantig yta. Ange basen och höjden rakt ut från basen.',
+  area_circle: 'Tvärsnittsarea för t.ex. ett borrhål. Ange radie eller diameter.',
+  circ: 'Omkretsen runt en cirkel, t.ex. ett borrhål eller ett rör.',
+  vol_box: 'Fast volym (m³) för en rektangulär kropp: längd × bredd × höjd, t.ex. en pall eller en grop.',
+  vol_cyl: 'Volym för en cylinder, t.ex. ett borrhål eller en kärna. Ange diameter och längd.',
+  vol_trap: 'Volym längs en tunnel, schakt eller skärning när du har tvärsektionsareor vid olika stationer.',
+  mass_from_vol: 'Hur många ton blir det? Volym gånger densitet. Ange om densiteten gäller fast eller löst berg.',
+  vol_from_mass: 'Hur många m³ motsvarar en vikt? Massa delat med densitet.',
+  stress_n: 'Tryck- eller dragspänning när en kraft verkar rakt mot en yta (kraft delat med area).',
+  stress_s: 'Skjuvspänning när en kraft verkar längs en yta.',
+  strain: 'Hur mycket ett prov har tryckts ihop eller förlängts i förhållande till sin längd.',
+  young: 'Bergets styvhet (E-modul) från spänning och töjning i ett provresultat.',
+  poisson: 'Hur mycket ett prov sväller åt sidan när det trycks ihop (Poissons tal) från provets töjningar.',
+  shear_mod: 'Skjuvmodul från E-modul och Poissons tal – värdena ska komma från provning.',
+  bulk_mod: 'Volymmodul (kompressionsmodul) från E-modul och Poissons tal.',
+  density: 'Densitet för ett prov: vikt delat med volym, t.ex. för att få bergets t/m³.',
+  unit_weight: 'Tunghet (kN/m³) – tyngden per kubikmeter, från densiteten.',
+  eff_stress: 'Spänningen som berget faktiskt bär när vattentryck finns i sprickor och porer.',
+  mohr: 'Skjuvhållfasthet längs en spricka eller yta från kohesion och friktionsvinkel, med valfri säkerhetsfaktor.',
+  rqd: 'RQD från borrkärna: hur stor del av kärnan som består av hela bitar på minst 10 cm.',
+  frac_freq: 'Antal sprickor per meter längs en mätlinje, t.ex. på en pallvägg.',
+  frac_spacing: 'Medelavstånd mellan sprickor längs en mätlinje.',
+  freq: 'Frekvens (Hz) från hur lång tid en svängning tar.',
+  period: 'Hur lång tid en svängning tar, från frekvensen.',
+  omega: 'Vinkelfrekvens (rad/s) från frekvensen – behövs i vissa vibrationsberäkningar.',
+  harm: 'Räkna om mellan förskjutning (mm), hastighet (mm/s) och acceleration för en ren svängning med känd frekvens.',
+  sine_rms: 'Räkna om mellan toppvärde, RMS och topp-till-topp för en ren sinussvängning.',
+  mean: 'Medelvärde av en serie mätvärden.',
+  rms: 'RMS (effektivvärde) av en serie mätvärden.',
+  peak: 'Största värdet (oavsett tecken) i en serie mätvärden.',
+  p2p: 'Skillnaden mellan högsta och lägsta värdet i en serie.',
+  stdev: 'Hur mycket mätvärdena sprider sig kring medelvärdet.',
+  abs_err: 'Hur mycket ett mätt värde skiljer sig från ett känt referensvärde, t.ex. vid kontroll av ett instrument.',
+  rel_err: 'Samma avvikelse i procent av referensvärdet.',
+  comb_unc: 'Total mätosäkerhet när flera oberoende osäkerheter läggs ihop.',
+  series: 'Klistra in eller skriv mätvärden och få medel, största värde, RMS, spridning, tabell och diagram.',
+  drill_len: 'Summera borrmeter för alla hål i en salva eller ett skift.',
+  drill_rate: 'Borrtakt: borrmeter per arbetstimme.',
+  worktime: 'Arbetstid från maskintid plus stillestånd, och hur stor andel maskinen gick.',
+  machtime: 'Maskintid från arbetstid minus stillestånd.',
+  downtime: 'Stilleståndstid från arbetstid minus maskintid.',
+  fuel_h: 'Bränsleförbrukning per maskintimme.',
+  fuel_unit: 'Bränsle per producerad enhet, t.ex. liter per borrmeter eller per m³.',
+  plan_act: 'Jämför planerad och faktisk produktion – avvikelse och hur stor del av målet som nåddes.',
+  total_cost: 'Summera kostnadsposter.',
+  cost_m: 'Kostnad per borrad meter.',
+  cost_v: 'Kostnad per kubikmeter berg. Ange om volymen är fast eller lös.',
+  cost_h: 'Kostnad per arbetstimme.',
+  budget_dev: 'Hur mycket över eller under budget du ligger, i kronor.',
+  budget_pct: 'Hur mycket över eller under budget du ligger, i procent.',
+  fuel_cost: 'Bränslekostnad från förbrukad mängd och literpris.',
+  spl_p: 'Räkna om ett uppmätt tryck (Pa) till nivå i dB. Ange om trycket är toppvärde eller RMS.',
+  p_spl: 'Räkna om en nivå i dB till tryck i Pa.',
+  sum_levels: 'Lägg ihop ljudnivåer från flera källor (gäller inte toppvärden från luftstöt).',
+  c_sound: 'Ljudets hastighet i luft vid en viss temperatur.',
+  dist_delay: 'Avstånd från ljudets gångtid, t.ex. tid mellan knall och ljud vid mätpunkten.',
+  speed_avg: 'Medelhastighet från sträcka och tid.',
+  blast_model: 'Din egen anteckning: räkna v från bergart/K, försättning och laddningskoncentration, och kvoten λ/v. Ej verifierad.',
+};
 /* Koppla formler ↔ kalkylatorer */
 /** Äldre poster: värden som sparats med en enhet för ett fält som nu har låst enhet räknas om (säkerhetsgranskning N2).
     Returnerar { raw, units, notes } där notes beskriver omräkningarna. */
@@ -2019,8 +2096,8 @@ function renderNav(st) {
   $('#bottom').innerHTML = NAV.map(n => `<a href="${n[3]}" ${st.nav === n[0] ? 'aria-current="page"' : ''}>${ic(n[2])}<span>${n[1]}</span></a>`).join('');
   $('#side').innerHTML = `<a class="brand" href="#/">${ic('logo', 'logo')}<span>Berg<b>Pro</b></span></a>` +
     NAV.map(n => `<a class="nav" href="${n[3]}" ${st.nav === n[0] ? 'aria-current="page"' : ''}>${ic(n[2])}${n[1]}</a>`).join('') +
-    `<div class="grp">Kategorier</div>` + CATS.map(c => `<a class="nav" href="#/cat/${c.id}" ${st.cat === c.id ? 'aria-current="page"' : ''}>${ic(c.ic)}${esc(c.n)}</a>`).join('') +
-    `<div class="grp">Verktyg</div><a class="nav" href="#/projects">${ic('folder')}Projekt</a><a class="nav" href="#/settings">${ic('settings')}Inställningar</a>`;
+    GROUPS.map(([g, title]) => `<div class="grp">${esc(title)}</div>` + CATS.filter(c => c.grp === g).map(c => `<a class="nav" href="#/cat/${c.id}" ${st.cat === c.id ? 'aria-current="page"' : ''}>${ic(c.ic)}${esc(c.n)}</a>`).join('')).join('') +
+    `<div class="grp">Övrigt</div><a class="nav" href="#/projects">${ic('folder')}Projekt och rapporter</a><a class="nav" href="#/help">${ic('info')}Så fungerar BergPro</a><a class="nav" href="#/settings">${ic('settings')}Inställningar</a>`;
 }
 const VIEWS = {};
 function render() {
@@ -2053,7 +2130,12 @@ const unvBadge = calcId => (calcId && isUnverified(calcId) ? '<span class="badge
 const itemRow = (href, icon, title, sub, right) => `<li><a class="item" href="${href}">${ic(icon, 'ic')}<span class="grow"><span class="t">${esc(title)}</span>${sub ? `<br><span class="s">${esc(sub)}</span>` : ''}</span>${right || ''}</a></li>`;
 
 /* ---------- Startsida ---------- */
-const QUICK = [['Volym', 'vol_box', 'geo'], ['Densitet', 'density', 'rockmech'], ['Normalspänning', 'stress_n', 'rockmech'], ['Frekvens', 'freq', 'vib'], ['RMS', 'rms', 'meas'], ['Medelvärde', 'mean', 'meas'], ['Kostnad per m³', 'cost_v', 'econ'], ['Enhetsomvandling', '@units', 'swap']];
+const QUICK = [['Räkna volym (m³)', 'vol_box', 'geo'], ['Räkna vikt (ton)', 'mass_from_vol', 'geo'], ['Borrmeter', 'drill_len', 'drill'], ['Borrtakt (m/h)', 'drill_rate', 'drill'], ['Analysera vibrationsmätning', 'series', 'meas'], ['Föra mätjournal', '@journal', 'air'], ['Kostnad per m³', 'cost_v', 'econ'], ['Omvandla enheter', '@units', 'swap']];
+const QUICK_HREF = { '@units': ['#/units', 'swap'], '@journal': ['#/reg/journal', 'note'] };
+/** Kategoriregister grupperat efter arbetsmoment. */
+function groupedCats(withCount) {
+  return GROUPS.map(([g, title, sub]) => { const cs = CATS.filter(c => c.grp === g); return `<section class="sec"><h2>${esc(title)}</h2><p class="small muted" style="margin:-6px 0 10px">${esc(sub)}</p><div class="grid wide">${cs.map(c => { const it = catItems(c.id), n = it.calcs.length + it.tools.length; return `<a class="tile ${App.lastCat === c.id ? 'sel' : ''}" href="#/cat/${c.id}">${ic(c.ic, 'ic')}<b>${esc(c.n)}</b><span>${esc(c.d)}</span>${withCount ? `<span class="badge acc">${n} verktyg</span>` : ''}</a>`; }).join('')}${g === 'follow' ? `<a class="tile" href="#/projects">${ic('folder', 'ic')}<b>Projekt och rapporter</b><span>Samla beräkningar, mätningar och kostnader per jobb och skriv ut en rapport.</span></a>` : ''}</div></section>`; }).join('');
+}
 function searchResultsHTML(q) {
   if (!q.trim()) return '';
   const res = Search.query(q, 30);
@@ -2072,11 +2154,12 @@ VIEWS.home = () => {
   const meas = [...Store.data.journal.map(j => ({ t: j.t, k: 'j', r: j })), ...Store.data.saved.map(s => ({ t: s.t, k: 's', r: s }))].sort((a, b) => b.t - a.t).slice(0, 4);
   const favRow = k => { const [ty, id] = [k[0], k.slice(2)]; if (ty === 'c' && CALC[id]) return itemRow('#/calc/' + id, CAT[CALC[id].cat].ic, CALC[id].title, CAT[CALC[id].cat].n, unvBadge(id)); if (ty === 'f' && FORM[id]) return itemRow('#/formula/' + id, 'book', FORM[id].name, 'Formel · ' + CAT[FORM[id].cat].n, FORM[id].type === 'unverified' ? '<span class="badge err">EJ VERIFIERAD</span>' : ''); if (ty === 't' && TOOL[id]) return itemRow(TOOL[id].href, TOOL[id].ic, TOOL[id].n, 'Verktyg'); return ''; };
   return `<div class="view">
-  <div class="searchbox"><label for="q">Vad vill du räkna ut?</label><div class="sbw">${ic('search')}<input id="q" type="search" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Sök: volym, tryck, RQD, kostnad …" value="${esc(App.q)}" data-act-input="search" aria-controls="searchRes"></div></div>
+  <div class="searchbox"><label for="q">Vad vill du räkna ut?</label><div class="sbw">${ic('search')}<input id="q" type="search" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Sök: ton, borrmeter, mm/s, kostnad …" value="${esc(App.q)}" data-act-input="search" aria-controls="searchRes"></div></div>
   <div id="searchRes" class="sec" style="margin-top:14px">${searchResultsHTML(App.q)}</div>
   <div id="homeSecs" ${App.q.trim() ? 'hidden' : ''}>
-  <section class="sec" aria-labelledby="hq"><h2 id="hq">Snabbberäkningar</h2><div class="grid">${QUICK.map(q => q[1][0] === '@' ? `<a class="tile quick" href="#/units">${ic('swap', 'ic')}<b>${q[0]}</b></a>` : `<a class="tile quick" href="#/calc/${q[1]}">${ic(CAT[q[2]] ? CAT[q[2]].ic : 'calc', 'ic')}<b>${q[0]}</b></a>`).join('')}</div></section>
-  <section class="sec" aria-labelledby="hc"><h2 id="hc">Kategorier</h2><div class="grid wide">${CATS.map(c => `<a class="tile ${App.lastCat === c.id ? 'sel' : ''}" href="#/cat/${c.id}">${ic(c.ic, 'ic')}<b>${esc(c.n)}</b><span>${esc(c.d)}</span></a>`).join('')}</div></section>
+  <a class="helpbar" href="#/help">${ic('info')}<span><b>Ny här?</b> Så fungerar BergPro – på två minuter</span></a>
+  <section class="sec" aria-labelledby="hq"><h2 id="hq">Vanliga uppgifter</h2><div class="grid">${QUICK.map(q => q[1][0] === '@' ? `<a class="tile quick" href="${QUICK_HREF[q[1]][0]}">${ic(QUICK_HREF[q[1]][1], 'ic')}<b>${q[0]}</b></a>` : `<a class="tile quick" href="#/calc/${q[1]}">${ic(CAT[q[2]] ? CAT[q[2]].ic : 'calc', 'ic')}<b>${q[0]}</b></a>`).join('')}</div></section>
+  ${groupedCats(false)}
   <section class="sec" aria-labelledby="hf"><h2 id="hf">Favoriter ${favs.length ? '<a class="small" href="#/favs">Visa alla</a>' : ''}</h2>${favs.length ? `<ul class="list">${favs.map(favRow).join('')}</ul>` : emptyBox('star', 'Inga favoriter ännu', 'Tryck på stjärnan på en kalkylator eller formel så hamnar den här.')}</section>
   <section class="sec" aria-labelledby="hr"><h2 id="hr">Senast använda beräkningar ${recentCalcs.length ? '<a class="small" href="#/history">Historik</a>' : ''}</h2>${recentCalcs.length ? `<ul class="list">${recentCalcs.map(h => itemRow(`#/calc/${h.calc}?h=${h.id}`, CAT[CALC[h.calc].cat].ic, CALC[h.calc].title, h.results && h.results[0] ? `${h.results[0].label}: ${resultLine(h.results[0])}` : '', unvBadge(h.calc))).join('')}</ul>` : emptyBox('clock', 'Ingen historik än', 'Dina senaste beräkningar visas här.')}</section>
   <section class="sec" aria-labelledby="hp"><h2 id="hp">Senaste projekt ${projs.length ? '<a class="small" href="#/projects">Alla projekt</a>' : ''}</h2>${projs.length ? `<ul class="list">${projs.map(p => itemRow('#/project/' + p.id, 'folder', p.name, p.date || '')).join('')}</ul>` : emptyBox('folder', 'Inga projekt', 'Samla beräkningar, mätningar och kostnader i ett projekt.', '<a class="btn" href="#/projects">Skapa projekt</a>')}</section>
@@ -2091,7 +2174,7 @@ function catItems(id) {
   const tools = TOOLS.filter(t => t.cat === id && !t.id.startsWith('u_'));
   return { calcs, tools };
 }
-VIEWS.cats = () => `<div class="view">${pageHead('Kategorier', { back: false })}<div class="grid wide">${CATS.map(c => { const it = catItems(c.id); const n = it.calcs.length + it.tools.length; return `<a class="tile ${App.lastCat === c.id ? 'sel' : ''}" href="#/cat/${c.id}" ${App.lastCat === c.id ? 'aria-current="true"' : ''}>${ic(c.ic, 'ic')}<b>${esc(c.n)}</b><span>${esc(c.d)}</span><span class="badge acc">${n} ${n === 1 ? 'verktyg' : 'verktyg'}</span></a>`; }).join('')}</div></div>`;
+VIEWS.cats = () => `<div class="view">${pageHead('Kategorier', { back: false })}<p class="muted">Sorterat efter arbetsmoment. Hittar du inte? Sök på startsidan med egna ord, t.ex. ”ton”, ”borrmeter” eller ”mm/s”.</p>${groupedCats(true)}</div>`;
 const CAT_NOTES = {
   rockmech: ['warn', 'Verkligt berg är ofta sprucket och kan ha riktningsberoende egenskaper. Modellerna här är idealiseringar – parametrar måste komma från provning eller verifierade källor.'],
   class: ['info', 'RMR och Q-systemet är inte implementerade: de kräver fullständiga, verifierade klasstabeller och källor som inte finns i appen. Hitta inte på poäng – använd den officiella metodbeskrivningen.'],
@@ -2108,7 +2191,7 @@ VIEWS.cat = r => {
   const c = CAT[r.parts[1]]; if (!c) return notFound();
   const { calcs, tools } = catItems(c.id);
   const note = CAT_NOTES[c.id];
-  const rows = [...tools.map(t => ({ href: t.href, ic: t.ic, t: t.n, s: t.d, k: 'Verktyg' })), ...calcs.map(x => ({ href: '#/calc/' + x.id, ic: c.ic, t: x.title, s: x.desc, k: 'Kalkylator', b: unvBadge(x.id) }))];
+  const rows = [...tools.map(t => ({ href: t.href, ic: t.ic, t: t.n, s: t.d, k: 'Verktyg' })), ...calcs.map(x => ({ href: '#/calc/' + x.id, ic: c.ic, t: x.title, s: PLAIN[x.id] || x.desc, k: 'Kalkylator', b: unvBadge(x.id) }))];
   return `<div class="view">${pageHead(c.n, { fallback: '#/cats', crumb: 'Kategori' })}<p class="muted">${esc(c.d)}</p>
   ${note ? noteBox(note[0], note[1]) : ''}
   ${rows.length > 8 ? `<div class="field" style="margin:14px 0"><label for="catf">Filtrera i kategorin</label><input id="catf" type="search" data-act-input="catfilter" placeholder="Skriv för att filtrera …" autocomplete="off"></div>` : ''}
@@ -2182,7 +2265,7 @@ VIEWS.calc = r => {
   const fl = (c.fs || [c.f]).map(id => FORM[id]).filter(Boolean), unv = isUnverified(c.id);
   const seen = new Set(), vars = fl.flatMap(x => x.vars).filter(v => !seen.has(v[0]) && seen.add(v[0]));
   return `<div class="view">${pageHead(c.title, { fallback: '#/cat/' + c.cat, crumb: `<a href="#/cat/${c.cat}">${esc(cat.n)}</a>`, right: favBtn('c:' + c.id) })}
-  <p class="muted">${esc(c.desc)}</p>
+  ${PLAIN[c.id] ? `<p class="plain">${esc(PLAIN[c.id])}</p>` : ''}<p class="small muted">${esc(c.desc)}</p>
   ${unv ? `<div class="note err" style="margin-top:12px" role="note">${ic('alert')}<div><b>${esc(UNVERIFIED_NOTICE)}</b>${c.notice ? `<ul style="margin:8px 0 0;padding-left:18px">${c.notice.slice(0, 2).map(n => `<li>${esc(n)}</li>`).join('')}</ul>${c.notice.length > 2 ? `<details class="more"><summary>Fler förbehåll (${c.notice.length - 2})</summary><ul style="margin:4px 0 0;padding-left:18px">${c.notice.slice(2).map(n => `<li>${esc(n)}</li>`).join('')}</ul></details>` : ''}` : ''}</div></div>` : ''}
   <div class="card" style="margin-top:12px"><h2 style="margin-bottom:8px">${fl.length > 1 ? 'Formler' : 'Formel'}</h2>${fl.map(formulaBlock).join('<div style="height:8px"></div>')}
   <details style="margin-top:10px"><summary class="small">Förklaring av symboler</summary><div class="tblwrap" style="margin-top:8px"><table class="tbl"><thead><tr><th>Symbol</th><th>Betydelse</th><th>Enhet</th></tr></thead><tbody>${vars.map(v => `<tr><td>${v[0]}</td><td>${esc(v[1])}</td><td>${esc(v[2])}</td></tr>`).join('')}</tbody></table></div></details></div>
@@ -2576,7 +2659,7 @@ VIEWS.history = () => `<div class="view">${pageHead('Historik', { back: false })
 
 /* ---------- Mer ---------- */
 VIEWS.more = () => {
-  const L = [['#/projects', 'folder', 'Projekt och rapporter', 'Samla beräkningar, mätningar och kostnader'], ['#/formulas', 'book', 'Formelsamling', FORMULAS.length + ' formler med källa och status'], ['#/units', 'swap', 'Enhetsomvandlare', 'Längd, tryck, densitet, energi m.fl.'], ['#/tool/quick', 'calc', 'Uttrycksräknare', 'Skriv t.ex. 2*(3+4)^2'], ['#/reg/journal', 'note', 'Mätjournal', 'Mätvärden, plats och instrument'], ['#/cat/std', 'shield', 'Standarder och dokumentation', 'Källor, risk, antaganden, granskning'], ['#/verif', 'check', 'Verifieringsstatus', 'Översikt över formlernas status'], ['#/selftest', 'pulse', 'Självtest', 'Kör kända testvärden mot beräkningarna'], ['#/settings', 'settings', 'Inställningar', 'Tema, precision, data, export och import'], ['#/about', 'info', 'Om BergPro', 'Användning, begränsningar och offline']];
+  const L = [['#/help', 'info', 'Så fungerar BergPro', 'Kom igång, etiketterna förklarade, vad appen inte gör'], ['#/projects', 'folder', 'Projekt och rapporter', 'Samla beräkningar, mätningar och kostnader'], ['#/formulas', 'book', 'Formelsamling', FORMULAS.length + ' formler med källa och status'], ['#/units', 'swap', 'Enhetsomvandlare', 'Längd, tryck, densitet, energi m.fl.'], ['#/tool/quick', 'calc', 'Uttrycksräknare', 'Skriv t.ex. 2*(3+4)^2'], ['#/reg/journal', 'note', 'Mätjournal', 'Mätvärden, plats och instrument'], ['#/cat/std', 'shield', 'Standarder och dokumentation', 'Källor, risk, antaganden, granskning'], ['#/verif', 'check', 'Verifieringsstatus', 'Översikt över formlernas status'], ['#/selftest', 'pulse', 'Självtest', 'Kör kända testvärden mot beräkningarna'], ['#/settings', 'settings', 'Inställningar', 'Tema, precision, data, export och import'], ['#/about', 'info', 'Om BergPro', 'Användning, begränsningar och offline']];
   return `<div class="view">${pageHead('Mer', { back: false })}<ul class="list">${L.map(x => itemRow(x[0], x[1], x[2], x[3])).join('')}</ul></div>`;
 };
 VIEWS.about = () => `<div class="view">${pageHead('Om BergPro', { fallback: '#/more' })}
@@ -2729,6 +2812,33 @@ VIEWS.project = r => {
   ${costs.length ? `<div class="tblwrap" style="margin-top:12px"><table class="tbl"><thead><tr><th>Post</th><th class="num">Belopp (kr)</th><th></th></tr></thead><tbody>${costs.map(c => `<tr><td>${esc(c.label)}</td><td class="num">${esc(Format.num(c.amount))}</td><td><button class="icon-btn" type="button" data-act="costdel" data-pid="${p.id}" data-id="${c.id}" aria-label="Radera kostnad">${ic('trash')}</button></td></tr>`).join('')}<tr><td><b>Summa</b></td><td class="num"><b>${esc(Format.num(total))}</b></td><td></td></tr>${kn.map(k => `<tr><td>${k[0]}</td><td class="num">${esc(k[1])}</td><td></td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted" style="margin-top:10px">Inga kostnader registrerade. Du anger alla priser själv.</p>'}
   ${costs.length && !(p.drillm > 0 && p.vol > 0) ? '<p class="small muted">Ange borrade meter och volym under Redigera projekt för nyckeltal.</p>' : ''}</div></div>`;
 };
+
+/* ---------- Hjälp i klarspråk ---------- */
+VIEWS.help = () => `<div class="view">${pageHead('Så fungerar BergPro', { fallback: '#/' })}
+  <div class="card stack"><h2>Kom igång</h2>
+  <ol class="howto">
+    <li><b>Hitta rätt.</b> Skriv med egna ord i sökrutan på startsidan, t.ex. ”ton”, ”borrmeter”, ”mm/s” eller ”kostnad”. Eller välj under <i>Vanliga uppgifter</i> eller arbetsmomenten <i>Före sprängning, Mätning, Uppföljning</i>.</li>
+    <li><b>Fyll i värdena.</b> Välj enhet i rutan bredvid fältet om den går att ändra. Decimalkomma och punkt fungerar båda.</li>
+    <li><b>Läs svaret.</b> Det räknas ut medan du skriver. Under svaret ser du uträkningen steg för steg (<i>Mellanled</i>).</li>
+    <li><b>Spara eller dela.</b> <i>Beräkna</i> sparar i historiken. <i>Spara</i> lägger resultatet i ett projekt. <i>Kopiera</i> och <i>Skriv ut</i> för att skicka vidare – välj ”Spara som PDF” för en PDF.</li>
+    <li><b>Säkerhetskopiera.</b> Allt sparas bara i telefonen. Gå till Inställningar → Exportera JSON då och då.</li>
+  </ol></div>
+  <div class="card stack" style="margin-top:16px"><h2>Vad etiketterna betyder</h2>
+  <dl class="kv">
+    <dt><span class="badge ok">Allmän fysikalisk formel</span></dt><dd>Grundläggande matematik eller fysik, t.ex. volym eller densitet.</dd>
+    <dt><span class="badge ok">Kontrollerad mot källa</span></dt><dd>Etablerad teknisk modell som kontrollerats mot angiven källa – inte fackgranskad för ditt projekt.</dd>
+    <dt><span class="badge warn">Projektspecifik</span></dt><dd>Nyckeltal som beror på hur ni räknar i projektet, t.ex. vad som räknas som arbetstid.</dd>
+    <dt><span class="badge err">EJ VERIFIERAD</span></dt><dd>Din egen modell från anteckningar. Får inte användas som underlag för dimensionering eller tändplan utan granskning av behörig person.</dd>
+  </dl></div>
+  <div class="card stack" style="margin-top:16px"><h2>Bra att veta</h2>
+  <ul class="howto">
+    <li><b>Förskjutning, hastighet och acceleration</b> är olika saker: mm, mm/s och m/s². Kontrollera vad instrumentet visar.</li>
+    <li><b>Toppvärde och RMS</b> är olika mått. Skriv alltid vilket du har mätt.</li>
+    <li><b>Fast och lös volym</b> ger olika densitet och olika kostnad per m³.</li>
+    <li>Sprickor och riktningar gör verkligt berg olikt modellerna – se formlernas antaganden.</li>
+  </ul></div>
+  ${noteBox('warn', 'BergPro innehåller inga gränsvärden och inga verifierade modeller för laddningsmängd, försättning, hålavstånd eller tändsekvens. Appen ersätter inte behörig sprängteknisk kompetens eller en projektspecifik riskbedömning.')}
+  <div class="actions" style="margin-top:12px"><a class="btn primary" href="#/">Till startsidan</a><a class="btn" href="#/cats">Alla kategorier</a></div></div>`;
 
 /* ============================================================
    BergPro – GRÄNSSNITT (del 3): rapporter/export, åtgärder (event delegation) och start

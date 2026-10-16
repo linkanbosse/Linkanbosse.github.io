@@ -12,6 +12,7 @@ Tekniskt beräkningsverktyg för bergmekanik, geometri, borrproduktion, vibratio
 Data sparas i webbläsarens `localStorage` på just den enheten. Det gäller favoriter, historik, sparade resultat, projekt, journaler och inställningar. Under **Inställningar** visas om lagringen är beständig. Exportera till JSON regelbundet som säkerhetskopia. Om lagring inte fungerar (t.ex. i vissa privata lägen) visas en varning, och data finns då bara kvar tills sidan stängs. Blir lagringen full tas de äldsta historikposterna bort automatiskt. Projekt och sparade resultat påverkas inte.
 
 ## Funktioner
+- **Struktur för sprängarbasen:** startsidan har *Vanliga uppgifter* (räkna volym, vikt, borrmeter, borrtakt, analysera vibrationsmätning, mätjournal, kostnad per m³, omvandla enheter) och kategorierna grupperade efter arbetsmoment: *Före sprängning, Mätning, Uppföljning, Verktyg och dokument*. Varje kalkylator har en mening i klarspråk om när den används, och sidan *Så fungerar BergPro* förklarar appen, etiketterna och vad appen inte gör.
 - **Startsida:**
   - sökning medan man skriver i namn, kategori, synonymer, beskrivning och relaterade begrepp
   - 8 snabbknappar och 13 kategorikort
@@ -74,7 +75,7 @@ Se `TESTRAPPORT.md` för detaljer, inklusive en checklista för test på riktig 
   - omräkning av äldre poster
   - lagring, import och export
   - modellens status
-- **Gränssnitt i Chromium på dator: 129/129.**
+- **Gränssnitt i Chromium på dator: 131/131.**
 - **Android-emulering: 92/92.** Testat på Pixel 7, Galaxy S24, Galaxy A55, Galaxy S8, Galaxy Tab S9 och Moto G4 med pekskärm. Utskriften renderades till riktig PDF.
 - **Inte testat:** riktig Android-telefon, iOS/Safari, Firefox, TalkBack och den riktiga utskriftsdialogen.
 
