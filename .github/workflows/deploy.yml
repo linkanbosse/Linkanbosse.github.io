@@ -1,4 +1,7 @@
-name: Deploy Cat Warriors to GitHub Pages
+name: Deploy to GitHub Pages
+
+# Publicerar webbplatsen. Finns ett npm-projekt (package.json) byggs det till dist/ som förut,
+# annars publiceras repot som statiska filer. Statiska mappar som bergpro/ följer alltid med.
 
 on:
   push:
@@ -21,14 +24,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Node.js
+        if: hashFiles('package.json') != ''
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - name: Install dependencies
-        run: npm install
-      - name: Build game
-        run: npm run build
+      - name: Build npm project
+        if: hashFiles('package.json') != ''
+        run: |
+          npm install
+          npm run build
+          cp -r bergpro dist/bergpro
+      - name: Prepare static site
+        if: hashFiles('package.json') == ''
+        run: |
+          mkdir -p dist
+          rsync -a --exclude '.git' --exclude '.github' ./ dist/
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
