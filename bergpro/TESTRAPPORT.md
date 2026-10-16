@@ -1,11 +1,11 @@
 # BergPro – testrapport
 
-Körd: 2026-10-16 18:38 (UTC) mot `index.html` byggd från `src/`. Endast tester som faktiskt har körts redovisas.
+Körd: 2026-10-16 18:44 (UTC) mot `index.html` byggd från `src/`. Endast tester som faktiskt har körts redovisas.
 
 | Svit | Miljö | Resultat |
 |---|---|---|
 | Självtest (beräkningsmotor, enheter, lagring) | Node v22.22.0 och i appen (Mer → Självtest) | **141/141** |
-| Gränssnitt, dator | Chromium (Playwright), `file://`, 320–1200 px | **124/124 godkända** |
+| Gränssnitt, dator | Chromium (Playwright), `file://`, 320–1200 px | **129/129 godkända** |
 | Gränssnitt, Android-emulering | Chromium med Android-profiler (pekskärm, mobil-UA, DPR) | **92/92 godkända** |
 
 ## Vad emuleringen inte ersätter
@@ -155,7 +155,7 @@ Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium
 - ✅ Äldre poster från egna modellen visas med aktuella etiketter och 3 siffror
 - ✅ Egen modell: K efter bergart enligt anteckningen (gnejs 22, granit 25, kvartsit 27, skiffer 18, alunskiffer 15)
 
-## 2. Gränssnitt på dator (124 kontroller)
+## 2. Gränssnitt på dator (129 kontroller)
 
 - ✅ start renderar sökfält
 - ✅ modellen är stjärnmärkt från start
@@ -256,6 +256,11 @@ Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium
 - ✅ självtest i appen: alla OK
 - ✅ självtest förorenar inte användardata
 - ✅ rensa historik efter bekräftelse
+- ✅ live: resultatet visas medan man skriver (3·4 = 12)
+- ✅ live: sparas inte i historiken förrän man trycker Beräkna
+- ✅ Beräkna sparar i historiken
+- ✅ egna modellen: avancerade fält hopfällda
+- ✅ egna modellen: live-resultat med bergart och en samlad varningsruta
 - ✅ sök "standard" ger inget sprängbesked (N5)
 - ✅ sök "sprickavstånd" ger inget sprängbesked (N5)
 - ✅ sök "riskkonsekvens" ger inget sprängbesked (N5)
@@ -402,9 +407,9 @@ Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium
 
 **Moto G4 (4× långsammare CPU)**
 
-- ✅ start till användbar sida: 257 ms
-- ✅ sökresultat efter inmatning: 99 ms
-- ✅ mätserie med 5000 värden (tabell + diagram): 434 ms
+- ✅ start till användbar sida: 350 ms
+- ✅ sökresultat efter inmatning: 106 ms
+- ✅ mätserie med 5000 värden (tabell + diagram): 476 ms
 - ✅ tabellen anger att 200 av 5000 visas
 
 ## Kvar att testa på en riktig Android-telefon

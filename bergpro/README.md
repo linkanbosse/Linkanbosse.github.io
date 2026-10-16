@@ -25,6 +25,7 @@ Data sparas i webbläsarens `localStorage` på just den enheten. Det gäller fav
   - mätserier från journalen blandar aldrig olika projekt, platser, topp/RMS, komponenter eller instrument
   - bergförhållanden, källregister, riskanteckningar, antaganden och granskning
 - **Projekt och rapporter:** kostnader och nyckeltal. Export till text, CSV, JSON och utskrift. För PDF väljer du **Spara som PDF** i utskriftsdialogen.
+- **Lättanvänt:** resultatet uppdateras medan du skriver (Beräkna sparar i historiken), och sällan använda fält ligger under en hopfälld del ”Avancerat”.
 - **Egna modeller:** din handskrivna modell, se nedan.
 
 ## Egna modeller (ej verifierade)
@@ -73,7 +74,7 @@ Se `TESTRAPPORT.md` för detaljer, inklusive en checklista för test på riktig 
   - omräkning av äldre poster
   - lagring, import och export
   - modellens status
-- **Gränssnitt i Chromium på dator: 124/124.**
+- **Gränssnitt i Chromium på dator: 129/129.**
 - **Android-emulering: 92/92.** Testat på Pixel 7, Galaxy S24, Galaxy A55, Galaxy S8, Galaxy Tab S9 och Moto G4 med pekskärm. Utskriften renderades till riktig PDF.
 - **Inte testat:** riktig Android-telefon, iOS/Safari, Firefox, TalkBack och den riktiga utskriftsdialogen.
 

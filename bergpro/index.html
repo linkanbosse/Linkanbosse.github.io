@@ -275,6 +275,12 @@ h1[tabindex="-1"]:focus{outline:none}
 .kv .badge,.item .badge{white-space:normal;max-width:100%}
 @media(max-width:380px){.kv{grid-template-columns:minmax(0,1fr)}.kv dd{margin-bottom:6px}}
 
+/* Lättanvändhet: hopfällda delar */
+details.adv{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:0 12px}
+details.adv[open]{padding-bottom:12px}
+details.adv>summary{font-weight:650}
+details.more>summary{min-height:36px;font-weight:650}
+
 </style>
 </head>
 <body>
@@ -1201,16 +1207,16 @@ fm('blast_t', 'Kvot t = λ / v (egen modell – inte ett tändintervall)', 'mode
   'Egen modell enligt användarens anteckning: t = λ / v.', 'v > 0, λ > 0.',
   MODEL_OPEN.slice(0, 2).join(' ') + ' BergPro avrundar inte till tändarsteg och ger inga förslag på tändsekvens.', SRC_NOTE,
   ['egen modell', 'anteckningar'], VERIF_NOTE);
-const RANGE = (id, label, unit) => ({ id, label, type: 'range', opt: true, unitLabel: unit, hint: 'Valfritt. Skriv min–max från din källa, t.ex. ”a–b”. Appen fyller inte i något.' });
-calc({ id: 'blast_model', f: 'blast_v', fs: ['blast_v', 'blast_t'], cat: 'model', title: 'Egen modell: v och kvoten λ/v (ej verifierad)', desc: 'v = K / B^a · l^b och t = λ / v enligt dina anteckningar. Ej verifierad modell – inte dimensioneringsunderlag och inte ett tändintervall. Alla värden anger du själv.', syn: ['egen modell', 'anteckningar', 'bergartskonstant', 'laddningskoncentration', 'bergart', 'granit', 'gnejs', 'kvartsit', 'skiffer', 'alunskiffer'], notice: MODEL_OPEN,
+const RANGE = (id, label, unit) => ({ id, label, type: 'range', opt: true, adv: 1, unitLabel: unit, hint: 'Valfritt. Skriv min–max från din källa, t.ex. ”a–b”. Appen fyller inte i något.' });
+calc({ id: 'blast_model', f: 'blast_v', fs: ['blast_v', 'blast_t'], cat: 'model', title: 'Egen modell: v och kvoten λ/v (ej verifierad)', advLabel: 'Avancerat: exponenter, λ i meter och giltighetsområden', desc: 'v = K / B^a · l^b och t = λ / v enligt dina anteckningar. Ej verifierad modell – inte dimensioneringsunderlag och inte ett tändintervall. Alla värden anger du själv.', syn: ['egen modell', 'anteckningar', 'bergartskonstant', 'laddningskoncentration', 'bergart', 'granit', 'gnejs', 'kvartsit', 'skiffer', 'alunskiffer'], notice: MODEL_OPEN,
   inputs: [SEL('rock', 'Bergart (föreslår K enligt dina anteckningar)', [['', 'Ingen – jag anger K själv'], ...Object.entries(ROCK_K).map(([k, r]) => [k, `${r[0]} – K = ${r[1]} enligt anteckningen`])], { def: '', fills: { target: 'K', values: Object.fromEntries(Object.entries(ROCK_K).map(([k, r]) => [k, r[1]])) }, hint: 'Värdena kommer från din handskrivna anteckning och är inte verifierade. Du kan ändra K efteråt.' }),
-    I('K', 'Bergartskonstant K', { noConv: 1, gt0: 1, opt: 1, unitLabel: 'enl. källan', hint: 'Fylls i när du väljer bergart, eller anges av dig. Gäller bara för B i m och l i kg/m.' }),
+    I('K', 'Bergartskonstant K', { noConv: 1, gt0: 1, opt: 1, hideOpt: 1, unitLabel: 'enl. källan', hint: 'Fylls i när du väljer bergart, eller anges av dig. Gäller bara för B i m och l i kg/m.' }),
     I('B', 'Försättning B', { noConv: 1, gt0: 1, unitLabel: 'm', hint: 'Anges i meter – modellen förutsätter B i m.' }),
     I('l', 'Laddningskoncentration l', { noConv: 1, gt0: 1, unitLabel: 'kg/m', hint: 'Kilogram per laddad meter.' }),
-    I('a', 'Exponent för B (a)', { noConv: 1, gt0: 1, def: '1,17', unitLabel: '–', hint: 'Förifylld från anteckningen. Ändra om din källa anger annat.' }),
-    I('b', 'Exponent för l (b)', { noConv: 1, gt0: 1, def: '0,39', unitLabel: '–', hint: 'Förifylld från anteckningen. Ändra om din källa anger annat.' }),
-    I('lamPct', 'λ som andel av försättningen B', { noConv: 1, opt: 1, gt0: 1, unitLabel: '% av B', hint: 'Ange λ antingen här eller som längd nedan – inte båda. Lämna båda tomma för att bara få v.' }),
-    I('lamM', 'λ som längd', { noConv: 1, opt: 1, gt0: 1, unitLabel: 'm' }),
+    I('a', 'Exponent för B (a)', { adv: 1, noConv: 1, gt0: 1, def: '1,17', unitLabel: '–', hint: 'Förifylld från anteckningen. Ändra om din källa anger annat.' }),
+    I('b', 'Exponent för l (b)', { adv: 1, noConv: 1, gt0: 1, def: '0,39', unitLabel: '–', hint: 'Förifylld från anteckningen. Ändra om din källa anger annat.' }),
+    I('lamPct', 'λ som andel av försättningen B', { noConv: 1, opt: 1, gt0: 1, unitLabel: '% av B', hint: 'Lämna tomt för att bara få v. λ kan också anges i meter under Avancerat.' }),
+    I('lamM', 'λ som längd', { adv: 1, noConv: 1, opt: 1, gt0: 1, unitLabel: 'm' }),
     RANGE('rB', 'Giltigt intervall för B enligt din källa', 'm'), RANGE('rl', 'Giltigt intervall för l enligt din källa', 'kg/m'), RANGE('rK', 'Giltigt intervall för K enligt din källa', 'enl. källan')],
   compute(v) {
     if (v.lamPct !== undefined && v.lamM !== undefined) throw new CalcError('Ange λ antingen i procent av B eller som längd – inte båda.', 'lamM');
@@ -2116,7 +2122,7 @@ const defaultOf = (inp) => (inp.def === '@g' ? String(Store.pref('g')).replace('
 function unitOptions(group, sel) { return UNITS[group].list.map(u => `<option value="${u[0]}" ${u[0] === sel ? 'selected' : ''}>${esc(u[1])}</option>`).join(''); }
 function fieldHTML(c, inp, draft) {
   const id = 'in-' + inp.id, raw = draft.raw[inp.id], val = raw !== undefined ? raw : defaultOf(inp);
-  const lab = `<label for="${id}">${esc(inp.label)}${inp.opt ? ' <span class="u">(valfritt)</span>' : ''}</label>`;
+  const lab = `<label for="${id}">${esc(inp.label)}${inp.opt && !inp.hideOpt ? ' <span class="u">(valfritt)</span>' : ''}</label>`;
   const hint = inp.hint ? `<div class="hint" id="h-${inp.id}">${esc(inp.hint).replace(/\n/g, '<br>')}</div>` : '';
   const msg = `<div class="msg" id="msg-${inp.id}" role="alert"></div>`;
   const desc = `aria-describedby="${inp.hint ? 'h-' + inp.id + ' ' : ''}msg-${inp.id}"`;
@@ -2177,12 +2183,14 @@ VIEWS.calc = r => {
   const seen = new Set(), vars = fl.flatMap(x => x.vars).filter(v => !seen.has(v[0]) && seen.add(v[0]));
   return `<div class="view">${pageHead(c.title, { fallback: '#/cat/' + c.cat, crumb: `<a href="#/cat/${c.cat}">${esc(cat.n)}</a>`, right: favBtn('c:' + c.id) })}
   <p class="muted">${esc(c.desc)}</p>
-  ${unv ? `<div class="note err" style="margin-top:12px" role="note">${ic('alert')}<div><b>${esc(UNVERIFIED_NOTICE)}</b>${c.notice ? `<ul style="margin:8px 0 0;padding-left:18px">${c.notice.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}</div></div>` : ''}
+  ${unv ? `<div class="note err" style="margin-top:12px" role="note">${ic('alert')}<div><b>${esc(UNVERIFIED_NOTICE)}</b>${c.notice ? `<ul style="margin:8px 0 0;padding-left:18px">${c.notice.slice(0, 2).map(n => `<li>${esc(n)}</li>`).join('')}</ul>${c.notice.length > 2 ? `<details class="more"><summary>Fler förbehåll (${c.notice.length - 2})</summary><ul style="margin:4px 0 0;padding-left:18px">${c.notice.slice(2).map(n => `<li>${esc(n)}</li>`).join('')}</ul></details>` : ''}` : ''}</div></div>` : ''}
   <div class="card" style="margin-top:12px"><h2 style="margin-bottom:8px">${fl.length > 1 ? 'Formler' : 'Formel'}</h2>${fl.map(formulaBlock).join('<div style="height:8px"></div>')}
   <details style="margin-top:10px"><summary class="small">Förklaring av symboler</summary><div class="tblwrap" style="margin-top:8px"><table class="tbl"><thead><tr><th>Symbol</th><th>Betydelse</th><th>Enhet</th></tr></thead><tbody>${vars.map(v => `<tr><td>${v[0]}</td><td>${esc(v[1])}</td><td>${esc(v[2])}</td></tr>`).join('')}</tbody></table></div></details></div>
   ${draft.legacy && draft.legacy.length ? noteBox('warn', draft.legacy.map(esc).join('<br>')) : ''}
   <form id="calcForm" class="card" novalidate data-calc="${c.id}" autocomplete="off"><h2 style="margin-bottom:12px">Indata</h2>
-    <div class="form ${c.inputs.length > 2 && c.inputs.every(i => i.type === 'num' || i.type === 'select' || i.type === 'text') ? 'two' : ''}">${c.inputs.map(i => fieldHTML(c, i, draft)).join('')}</div>
+    <div class="form ${c.inputs.length > 2 && c.inputs.every(i => i.type === 'num' || i.type === 'select' || i.type === 'text') ? 'two' : ''}">${c.inputs.filter(i => !i.adv).map(i => fieldHTML(c, i, draft)).join('')}</div>
+    ${c.inputs.some(i => i.adv) ? `<details class="adv" ${c.inputs.some(i => i.adv && draft.raw[i.id] !== undefined && draft.raw[i.id] !== '' && draft.raw[i.id] !== defaultOf(i)) ? 'open' : ''}><summary>${esc(c.advLabel || 'Avancerat')}</summary><div class="form two">${c.inputs.filter(i => i.adv).map(i => fieldHTML(c, i, draft)).join('')}</div></details>` : ''}
+    <p class="small muted" style="margin-top:10px">Resultatet uppdateras medan du skriver. Tryck <b>Beräkna</b> för att spara i historiken.</p>
     <div class="actions"><button class="btn primary" type="submit">${ic('calc')}Beräkna</button><button class="btn" type="button" data-act="clear">Rensa</button></div></form>
   <div id="calcOut" class="stack" style="margin-top:16px" aria-live="polite"></div>
   <div class="stack" style="margin-top:16px">${fl.map(x => metaCard(x, unv)).join('')}</div>
@@ -2205,6 +2213,19 @@ function showErrors(c, errors) {
     fld.classList.add('bad'); $('.msg', fld).textContent = m; el.setAttribute('aria-invalid', 'true'); if (!first) first = el;
   });
   return first;
+}
+/** Live-beräkning medan användaren skriver: visar resultat när indata är giltiga, utan felmarkeringar och utan historik. */
+function liveCalc(c) {
+  const { raw, units } = readForm(c);
+  App.drafts[c.id] = { raw, units };
+  const out = $('#calcOut'); if (!out) return;
+  let res; try { res = Engine.run(c, raw, units); } catch (e) { return; }
+  if (!res.ok) { App.last = null; out.innerHTML = `<p class="small muted">${ic('info')} Fyll i fälten för att se resultatet.</p>`; return; }
+  showErrors(c, {}); $$('#calcForm [aria-invalid]').forEach(e => e.removeAttribute('aria-invalid'));
+  const o = res.out;
+  const ins = (() => { const tmp = { _units: {}, _ul: {}, _raw: {} }; c.inputs.forEach(inp => { try { Engine.read(inp, Object.assign({}, raw), units, tmp); } catch (e) { /* ignoreras */ } }); return inputSummary(c, tmp, raw); })();
+  App.last = { calc: c.id, raw, units, out: o, ins, t: Date.now() };
+  out.innerHTML = resultHTML(c, o);
 }
 function calcSubmit(c, silent) {
   const { raw, units } = readForm(c);
@@ -2241,7 +2262,8 @@ function resultHTML(c, o) {
     if (first) { h += `<div class="lbl">${esc(r.label)}${r.sym ? ' (' + esc(r.sym) + ')' : ''}</div><div class="big">${r.text !== undefined ? esc(r.text) : esc(Format.num(r.value, r.sig))}${r.unit ? `<small>${esc(r.unit)}</small>` : ''}</div>`; first = false; }
     else h += `<div class="alt"><span>${esc(r.label)}${r.sym ? ' <span class="muted">(' + esc(r.sym) + ')</span>' : ''}</span><b>${esc(resultLine(r))}</b></div>`;
   });
-  const warns = (o.warnings || []).map(w => noteBox(unv ? 'err' : 'warn', esc(w))).join('');
+  const ws = o.warnings || [];
+  const warns = unv ? (ws.length ? `<div class="note err">${ic('alert')}<div><b>${esc(ws[0])}</b>${ws.length > 1 ? `<ul style="margin:6px 0 0;padding-left:18px">${ws.slice(1).map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}</div></div>` : '') : ws.map(w => noteBox('warn', esc(w))).join('');
   if (unv) h += `<div class="stack" style="margin-top:12px">${warns}</div>`;
   h += `<div class="actions"><button class="btn sm" type="button" data-act="copyres">${ic('copy')}Kopiera</button><button class="btn sm" type="button" data-act="saveres">${ic('save')}Spara</button><button class="btn sm" type="button" data-act="printres">${ic('print')}Skriv ut</button></div></section>`;
   if (!unv) h += warns;
@@ -2967,9 +2989,12 @@ document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
   const fn = ACT[el.dataset.act]; if (fn) { e.preventDefault(); try { fn(el, e); } catch (err) { console.error(err); toast('Något gick fel: ' + err.message, true); } }
 });
-document.addEventListener('input', e => { const el = e.target.closest('[data-act-input]'); if (el && INPUT[el.dataset.actInput]) INPUT[el.dataset.actInput](el); });
+let liveTimer = null;
+const scheduleLive = () => { clearTimeout(liveTimer); liveTimer = setTimeout(() => { const c = curCalc(); if (c) liveCalc(c); }, 350); };
+document.addEventListener('input', e => { if (e.target.closest && e.target.closest('#calcForm')) scheduleLive(); const el = e.target.closest('[data-act-input]'); if (el && INPUT[el.dataset.actInput]) INPUT[el.dataset.actInput](el); });
 document.addEventListener('change', e => {
   const el = e.target;
+  if (el.closest && el.closest('#calcForm')) scheduleLive();
   if (el.id === 'importFile') { const f = el.files && el.files[0]; if (!f) return; if (f.size > 20e6) { toast('Filen är för stor (max 20 MB).', true); return; } const rd = new FileReader(); rd.onload = () => { importDialog(String(rd.result)); el.value = ''; }; rd.onerror = () => toast('Kunde inte läsa filen.', true); rd.readAsText(f); return; }
   const a = el.closest('[data-act-change]'); if (a && CHANGE[a.dataset.actChange]) { CHANGE[a.dataset.actChange](a); return; }
   /* kalkylator: byte av val som styr enhetsgrupp (t.ex. radie/diameter, storhet) */
@@ -2986,7 +3011,7 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('submit', e => {
   const f = e.target; e.preventDefault();
-  if (f.id === 'calcForm') return calcSubmit(CALC[f.dataset.calc]);
+  if (f.id === 'calcForm') { clearTimeout(liveTimer); return calcSubmit(CALC[f.dataset.calc]); }
   if (f.id === 'quickForm') { App.quickSrc = $('#qe').value; $('#quickOut').innerHTML = quickOutHTML(App.quickSrc); return; }
   if (f.id === 'regForm') {
     const reg = REGS[f.dataset.reg], { rec, errors } = readFields(reg.fields, 'r-');
