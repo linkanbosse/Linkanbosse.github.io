@@ -1,17 +1,17 @@
 # BergPro – testrapport
 
-Körd: 2026-10-14 18:23 (UTC) mot `index.html` byggd från `src/`. Endast tester som faktiskt har körts redovisas.
+Körd: 2026-10-16 18:38 (UTC) mot `index.html` byggd från `src/`. Endast tester som faktiskt har körts redovisas.
 
 | Svit | Miljö | Resultat |
 |---|---|---|
-| Självtest (beräkningsmotor, enheter, lagring) | Node v22.22.0 och i appen (Mer → Självtest) | **140/140** |
-| Gränssnitt, dator | Chromium (Playwright), `file://`, 320–1200 px | **123/123 godkända** |
+| Självtest (beräkningsmotor, enheter, lagring) | Node v22.22.0 och i appen (Mer → Självtest) | **141/141** |
+| Gränssnitt, dator | Chromium (Playwright), `file://`, 320–1200 px | **124/124 godkända** |
 | Gränssnitt, Android-emulering | Chromium med Android-profiler (pekskärm, mobil-UA, DPR) | **92/92 godkända** |
 
 ## Vad emuleringen inte ersätter
 Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium) med riktiga enhetsprofiler, men inte på en fysisk telefon. Filåtkomst via filhanteraren, beständighet för lokala filer, systemets utskriftsdialog, tangentbord och TalkBack måste kontrolleras på telefonen – se checklistan sist.
 
-## 1. Självtest (140 st)
+## 1. Självtest (141 st)
 
 - ✅ Svensk decimalinmatning: "1 234,5" = 1234,5
 - ✅ Decimalpunkt och exponent: "1,2e-3"
@@ -153,8 +153,9 @@ Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium
 - ✅ Sökning: friskrivningstext gör inte modellen sökbar (tändintervall, dimensionering, tändare)
 - ✅ Status och exempelvärden: inga sprängtekniska talvärden i statustexter eller felmeddelanden
 - ✅ Äldre poster från egna modellen visas med aktuella etiketter och 3 siffror
+- ✅ Egen modell: K efter bergart enligt anteckningen (gnejs 22, granit 25, kvartsit 27, skiffer 18, alunskiffer 15)
 
-## 2. Gränssnitt på dator (123 kontroller)
+## 2. Gränssnitt på dator (124 kontroller)
 
 - ✅ start renderar sökfält
 - ✅ modellen är stjärnmärkt från start
@@ -212,6 +213,7 @@ Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium
 - ✅ kategorin Egna modeller visar kalkylatorn och varning
 - ✅ kalkylatorsidan visar statusruta och öppna frågor före formeln
 - ✅ K, B, l är tomma från start
+- ✅ val av bergart granit fyller K = 25 (från anteckningen)
 - ✅ modell: v visas med 3 siffror (20,8 m/s), t = 0,0769 s
 - ✅ modell visar ej-verifierad-varning
 - ✅ resultatkortet märkt EJ VERIFIERAD med varningar före knapparna
@@ -374,9 +376,9 @@ Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium
 - ✅ dialogrutan ryms på skärmen
 - ✅ sparade resultat syns i projektet (2 st)
 - ✅ meddelanden (toast) visas ovanför bottenmenyn
-- ✅ rapport TXT laddas ned (bergpro-android-test-2026-10-14.txt)
-- ✅ rapport CSV laddas ned (bergpro-android-test-2026-10-14.csv)
-- ✅ rapport JSON laddas ned (bergpro-android-test-2026-10-14.json)
+- ✅ rapport TXT laddas ned (bergpro-android-test-2026-10-16.txt)
+- ✅ rapport CSV laddas ned (bergpro-android-test-2026-10-16.csv)
+- ✅ rapport JSON laddas ned (bergpro-android-test-2026-10-16.json)
 - ✅ CSV har BOM och semikolon (öppnas rätt i svensk Excel)
 - ✅ utskrift anropar webbläsarens utskriftsdialog
 - ✅ användaren informeras om "Spara som PDF"
@@ -400,9 +402,9 @@ Android-testerna körs i samma webbläsarmotor som Chrome för Android (Chromium
 
 **Moto G4 (4× långsammare CPU)**
 
-- ✅ start till användbar sida: 566 ms
-- ✅ sökresultat efter inmatning: 235 ms
-- ✅ mätserie med 5000 värden (tabell + diagram): 713 ms
+- ✅ start till användbar sida: 257 ms
+- ✅ sökresultat efter inmatning: 99 ms
+- ✅ mätserie med 5000 värden (tabell + diagram): 434 ms
 - ✅ tabellen anger att 200 av 5000 visas
 
 ## Kvar att testa på en riktig Android-telefon

@@ -33,7 +33,8 @@ Kalkylatorn **”Egen modell: v och kvoten λ/v (ej verifierad)”** räknar v =
   - Anteckningens λ-exempel är inkonsekvent: 40 % av 2 m är 0,8 m, inte 1,6 m.
   - Det är inte fastställt vilken fysikalisk storhet v är.
 - **t presenteras inte som ett tändintervall.** Det heter "Kvot λ/v – inte ett tändintervall" och visas bara i sekunder med 3 gällande siffror. Appen avrundar inte till tändarsteg och föreslår ingen tändsekvens.
-- K, B, l och λ fylls aldrig i av appen. B är låst till m och l till kg/m, som anteckningen förutsätter. Exponenterna 1,17 och 0,39 är förifyllda från anteckningen och kan ändras.
+- **K efter bergart:** väljer du bergart föreslås K enligt din anteckning – gnejs 22, granit 25, kvartsit 27, skiffer 18, alunskiffer 15 – med anteckningen som källa och markerat som ej verifierat. Du kan skriva ett eget K; avviker det från anteckningens värde visas en upplysning och ditt värde används.
+- B, l och λ fylls aldrig i av appen. B är låst till m och l till kg/m, som anteckningen förutsätter. Exponenterna 1,17 och 0,39 är förifyllda från anteckningen och kan ändras.
 - λ anges i % av B eller i meter. Du kan ange ett eget giltighetsområde från din källa, och appen varnar om indata ligger utanför det.
 - Statusen **EJ VERIFIERAD** följer med resultatet överallt:
   - i listor och sökträffar
@@ -64,7 +65,7 @@ Kalkylatorn **”Egen modell: v och kvoten λ/v (ej verifierad)”** räknar v =
 
 ## Tester som faktiskt körts
 Se `TESTRAPPORT.md` för detaljer, inklusive en checklista för test på riktig Android-telefon.
-- **Självtest** (`node run-tests.js`, även Mer → Självtest i appen): **140/140**. Det omfattar:
+- **Självtest** (`node run-tests.js`, även Mer → Självtest i appen): **141/141**. Det omfattar:
   - kända värden för alla kalkylatorer
   - en oberoende referenstabell för samtliga enhetsfaktorer
   - inversa samband
@@ -72,7 +73,7 @@ Se `TESTRAPPORT.md` för detaljer, inklusive en checklista för test på riktig 
   - omräkning av äldre poster
   - lagring, import och export
   - modellens status
-- **Gränssnitt i Chromium på dator: 123/123.**
+- **Gränssnitt i Chromium på dator: 124/124.**
 - **Android-emulering: 92/92.** Testat på Pixel 7, Galaxy S24, Galaxy A55, Galaxy S8, Galaxy Tab S9 och Moto G4 med pekskärm. Utskriften renderades till riktig PDF.
 - **Inte testat:** riktig Android-telefon, iOS/Safari, Firefox, TalkBack och den riktiga utskriftsdialogen.
 

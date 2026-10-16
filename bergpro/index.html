@@ -1188,9 +1188,11 @@ const MODEL_OPEN = [
   'K gäller bara för de enheter modellen har tagits fram för – enligt anteckningen B i meter och l i kg/m. Därför är B och l låsta till de enheterna.',
   'Exponenterna 1,17 och 0,39 är avlästa från en handskriven anteckning.',
 ];
+/* K per bergart enligt användarens anteckning (2024-12-27): ”gnejs 22, granit 25, kvartsit 27, skiffer 18, alunskiffer 15”. */
+const ROCK_K = { gnejs: ['Gnejs', 22], granit: ['Granit', 25], kvartsit: ['Kvartsit', 27], skiffer: ['Skiffer', 18], alunskiffer: ['Alunskiffer', 15] };
 const RS = (label, value, unit, sym) => ({ label, value, unit, sym, sig: 3 }); /* begränsad visningsprecision */
 fm('blast_v', 'v = K / Bᵃ · lᵇ (egen modell, ej verifierad)', 'model', 'unverified', `v = ${F('<i>K</i>', sup('<i>B</i>', '<i>a</i>'))} · ${sup('<i>l</i>', '<i>b</i>')}`,
-  [['v', 'Hastighet enligt anteckningen (”hastigheten på bergmassan”) – storheten är inte fastställd', 'm/s'], ['K', 'Bergartskonstant, anges av användaren', 'enhet enligt källan (gäller för B i m, l i kg/m)'], ['B', 'Försättning', 'm'], ['l', 'Laddningskoncentration', 'kg/m'], ['a', 'Exponent för B (anteckningen: 1,17)', '–'], ['b', 'Exponent för l (anteckningen: 0,39)', '–']],
+  [['v', 'Hastighet enligt anteckningen (”hastigheten på bergmassan”) – storheten är inte fastställd', 'm/s'], ['K', 'Bergartskonstant, anges av användaren eller väljs per bergart enligt anteckningen (gnejs 22, granit 25, kvartsit 27, skiffer 18, alunskiffer 15)', 'enhet enligt källan (gäller för B i m, l i kg/m)'], ['B', 'Försättning', 'm'], ['l', 'Laddningskoncentration', 'kg/m'], ['a', 'Exponent för B (anteckningen: 1,17)', '–'], ['b', 'Exponent för l (anteckningen: 0,39)', '–']],
   'Egen empirisk modell enligt användarens anteckning: v = K / B^1,17 · l^0,39.', 'B > 0, l > 0, K > 0. Giltighetsområdet är okänt – ange det från din källa i kalkylatorn.',
   MODEL_OPEN.join(' '), SRC_NOTE,
   ['egen modell', 'anteckningar', 'bergartskonstant', 'laddningskoncentration'], VERIF_NOTE);
@@ -1200,8 +1202,9 @@ fm('blast_t', 'Kvot t = λ / v (egen modell – inte ett tändintervall)', 'mode
   MODEL_OPEN.slice(0, 2).join(' ') + ' BergPro avrundar inte till tändarsteg och ger inga förslag på tändsekvens.', SRC_NOTE,
   ['egen modell', 'anteckningar'], VERIF_NOTE);
 const RANGE = (id, label, unit) => ({ id, label, type: 'range', opt: true, unitLabel: unit, hint: 'Valfritt. Skriv min–max från din källa, t.ex. ”a–b”. Appen fyller inte i något.' });
-calc({ id: 'blast_model', f: 'blast_v', fs: ['blast_v', 'blast_t'], cat: 'model', title: 'Egen modell: v och kvoten λ/v (ej verifierad)', desc: 'v = K / B^a · l^b och t = λ / v enligt dina anteckningar. Ej verifierad modell – inte dimensioneringsunderlag och inte ett tändintervall. Alla värden anger du själv.', syn: ['egen modell', 'anteckningar', 'bergartskonstant', 'laddningskoncentration'], notice: MODEL_OPEN,
-  inputs: [I('K', 'Bergartskonstant K', { noConv: 1, gt0: 1, unitLabel: 'enl. källan', hint: 'Anges av dig från din källa och gäller bara för B i m och l i kg/m. Appen föreslår inget värde.' }),
+calc({ id: 'blast_model', f: 'blast_v', fs: ['blast_v', 'blast_t'], cat: 'model', title: 'Egen modell: v och kvoten λ/v (ej verifierad)', desc: 'v = K / B^a · l^b och t = λ / v enligt dina anteckningar. Ej verifierad modell – inte dimensioneringsunderlag och inte ett tändintervall. Alla värden anger du själv.', syn: ['egen modell', 'anteckningar', 'bergartskonstant', 'laddningskoncentration', 'bergart', 'granit', 'gnejs', 'kvartsit', 'skiffer', 'alunskiffer'], notice: MODEL_OPEN,
+  inputs: [SEL('rock', 'Bergart (föreslår K enligt dina anteckningar)', [['', 'Ingen – jag anger K själv'], ...Object.entries(ROCK_K).map(([k, r]) => [k, `${r[0]} – K = ${r[1]} enligt anteckningen`])], { def: '', fills: { target: 'K', values: Object.fromEntries(Object.entries(ROCK_K).map(([k, r]) => [k, r[1]])) }, hint: 'Värdena kommer från din handskrivna anteckning och är inte verifierade. Du kan ändra K efteråt.' }),
+    I('K', 'Bergartskonstant K', { noConv: 1, gt0: 1, opt: 1, unitLabel: 'enl. källan', hint: 'Fylls i när du väljer bergart, eller anges av dig. Gäller bara för B i m och l i kg/m.' }),
     I('B', 'Försättning B', { noConv: 1, gt0: 1, unitLabel: 'm', hint: 'Anges i meter – modellen förutsätter B i m.' }),
     I('l', 'Laddningskoncentration l', { noConv: 1, gt0: 1, unitLabel: 'kg/m', hint: 'Kilogram per laddad meter.' }),
     I('a', 'Exponent för B (a)', { noConv: 1, gt0: 1, def: '1,17', unitLabel: '–', hint: 'Förifylld från anteckningen. Ändra om din källa anger annat.' }),
@@ -1211,12 +1214,19 @@ calc({ id: 'blast_model', f: 'blast_v', fs: ['blast_v', 'blast_t'], cat: 'model'
     RANGE('rB', 'Giltigt intervall för B enligt din källa', 'm'), RANGE('rl', 'Giltigt intervall för l enligt din källa', 'kg/m'), RANGE('rK', 'Giltigt intervall för K enligt din källa', 'enl. källan')],
   compute(v) {
     if (v.lamPct !== undefined && v.lamM !== undefined) throw new CalcError('Ange λ antingen i procent av B eller som längd – inte båda.', 'lamM');
+    const rock = ROCK_K[v.rock];
+    if (v.K === undefined && !rock) throw new CalcError('Välj bergart eller ange K.', 'K');
+    const K = v.K !== undefined ? v.K : rock[1], kNote = [];
+    if (rock && v.K === undefined) kNote.push(`K = ${fmt(K)} för ${rock[0].toLowerCase()} enligt dina anteckningar (ej verifierat).`);
+    else if (rock && v.K !== rock[1]) kNote.push(`Du har angett K = ${fmt(v.K)}; anteckningens värde för ${rock[0].toLowerCase()} är ${rock[1]}. Ditt värde används.`);
+    else if (rock) kNote.push(`K = ${fmt(K)} för ${rock[0].toLowerCase()} enligt dina anteckningar (ej verifierat).`);
+    v = Object.assign({}, v, { K });
     const vv = v.K / Math.pow(v.B, v.a) * Math.pow(v.l, v.b);
     if (!Number.isFinite(vv) || !(vv > 0)) throw new CalcError('v kan inte beräknas med de angivna värdena.');
     const f3 = x => Format.num(x, 3);
     const res = [RS('v enligt egen modell, ej verifierad', vv, 'm/s', '')];
     const steps = [`v = K / B^a · l^b = ${fmt(v.K)} / ${fmt(v.B)}^${fmt(v.a)} · ${fmt(v.l)}^${fmt(v.b)} ≈ ${f3(vv)} m/s`];
-    const w = [UNVERIFIED_NOTICE];
+    const w = [UNVERIFIED_NOTICE, ...kNote];
     if (v.lamPct !== undefined || v.lamM !== undefined) {
       const lam = v.lamM !== undefined ? v.lamM : v.lamPct / 100 * v.B, t = lam / vv;
       if (!Number.isFinite(t)) throw new CalcError('Kvoten λ/v kan inte beräknas med de angivna värdena.');
@@ -1645,7 +1655,7 @@ const SelfTest = (() => {
       const raw = Object.assign({}, sample);
       if (c.id === 'sine_rms') raw.mode = 'peak'; if (c.id === 'harm') raw.u = '1'; if (c.id === 'p_spl') raw.L = '90'; if (c.id === 'c_sound') raw.T = '15'; if (c.id === 'dist_delay') raw.c = '343';
       if (c.id === 'worktime' || c.id === 'machtime' || c.id === 'downtime') { raw.tm = '4'; raw.ti = '1'; raw.tw = '5'; }
-      if (c.id === 'blast_model') Object.assign(raw, { K: '3', B: '4', l: '2', a: '1', b: '1', lamPct: '50', lamM: '' });
+      if (c.id === 'blast_model') Object.assign(raw, { rock: '', K: '3', B: '4', l: '2', a: '1', b: '1', lamPct: '50', lamM: '' });
       if (c.id === 'rqd') { raw.L = '1'; raw.p = '30 20 10'; }
       if (c.id === 'poisson') { raw.el = '-0,0003'; raw.ea = '0,001'; }
       if (c.id === 'fuel_h') { raw.V = '100'; raw.t = '5'; }
@@ -1892,6 +1902,18 @@ const SelfTest = (() => {
     const old = { calc: 'blast_model', raw: { K: '25', B: '2', l: '5', a: '1,17', b: '0,39', lamPct: '40' }, units: {}, results: [{ label: 'Tid', value: 0.0384376450111, unit: 's' }] };
     const r = shownResults(old); if (r.some(x => x.label === 'Tid') || !r.some(x => /inte ett tändintervall/.test(x.label)) || r.some(x => !x.alt && x.sig !== 3)) throw new Error(JSON.stringify(r.map(x => x.label)));
     const plain = { calc: 'vol_box', raw: {}, results: [{ label: 'Volym', value: 1.23456789, unit: 'm³' }] }; if (shownResults(plain)[0].sig) throw new Error('vanliga formler ska inte begränsas');
+  });
+
+  t('Egen modell: K efter bergart enligt anteckningen (gnejs 22, granit 25, kvartsit 27, skiffer 18, alunskiffer 15)', () => {
+    const E = { B: '2', l: '5', a: '1,17', b: '0,39' };
+    for (const [rock, K] of [['gnejs', 22], ['granit', 25], ['kvartsit', 27], ['skiffer', 18], ['alunskiffer', 15]]) {
+      const o = run('blast_model', { rock, K: '', ...E }); near(o.results[0].value, K / Math.pow(2, 1.17) * Math.pow(5, 0.39), 1e-12);
+      if (!o.warnings.some(w => /enligt dina anteckningar/.test(w))) throw new Error('källa saknas för ' + rock);
+    }
+    const own = run('blast_model', { rock: 'granit', K: '24', ...E }); near(own.results[0].value, 24 / Math.pow(2, 1.17) * Math.pow(5, 0.39), 1e-12);
+    if (!own.warnings.some(w => /Ditt värde används/.test(w))) throw new Error('avvikelsevarning saknas');
+    bad('blast_model', { rock: '', K: '', ...E }, {}, 'K');
+    if (!/granit/.test(Search.query('granit', 10).map(x => x.id).join(' ') + ' ') && !Search.query('granit', 10).some(x => x.id === 'blast_model')) throw new Error('sök granit');
   });
 
   return {
@@ -2952,6 +2974,8 @@ document.addEventListener('change', e => {
   const a = el.closest('[data-act-change]'); if (a && CHANGE[a.dataset.actChange]) { CHANGE[a.dataset.actChange](a); return; }
   /* kalkylator: byte av val som styr enhetsgrupp (t.ex. radie/diameter, storhet) */
   const c = curCalc();
+  const fin = c && el.dataset.in && c.inputs.find(i => i.id === el.dataset.in && i.fills);
+  if (fin) { const val = fin.fills.values[el.value], t = $('#in-' + fin.fills.target); if (t && val !== undefined) { t.value = String(val).replace('.', ','); t.dispatchEvent(new Event('input', { bubbles: true })); } }
   if (c && el.dataset.in && c.inputs.some(i => i.unitDyn && i.unitDyn.dep === el.dataset.in)) {
     const d = readForm(c); App.drafts[c.id] = d;
     $('#calcForm .form').innerHTML = c.inputs.map(i => fieldHTML(c, i, d)).join('');

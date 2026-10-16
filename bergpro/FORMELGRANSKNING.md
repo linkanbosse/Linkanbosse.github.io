@@ -2,7 +2,7 @@
 
 Granskningsdatum: 2026-10-14  
 Granskare: AI-assistent (Claude) mot angivna källor – ej fackgranskad av behörig person  
-Självtest vid generering: **140/140 godkända**  
+Självtest vid generering: **141/141 godkända**  
 Antal formler: 63 · Kalkylatorer: 59
 
 > Rapporten genereras automatiskt från appens formelregister (`node review-report.js`), så den visar exakt det som finns i appen. Granskningen är gjord av en AI-assistent mot de angivna källorna och ersätter inte fackgranskning av behörig person.
@@ -979,14 +979,14 @@ Källhänvisningen har preciserats för 61 formler (version 1.1). Innehållsliga
 |---|---|
 | Uttryck | `v = (K)/(B^a) · l^b` |
 | Typ | Ej verifierad (egen/okänd källa) |
-| Variabler | v: Hastighet enligt anteckningen (”hastigheten på bergmassan”) – storheten är inte fastställd [m/s]; K: Bergartskonstant, anges av användaren [enhet enligt källan (gäller för B i m, l i kg/m)]; B: Försättning [m]; l: Laddningskoncentration [kg/m]; a: Exponent för B (anteckningen: 1,17) [–]; b: Exponent för l (anteckningen: 0,39) [–] |
+| Variabler | v: Hastighet enligt anteckningen (”hastigheten på bergmassan”) – storheten är inte fastställd [m/s]; K: Bergartskonstant, anges av användaren eller väljs per bergart enligt anteckningen (gnejs 22, granit 25, kvartsit 27, skiffer 18, alunskiffer 15) [enhet enligt källan (gäller för B i m, l i kg/m)]; B: Försättning [m]; l: Laddningskoncentration [kg/m]; a: Exponent för B (anteckningen: 1,17) [–]; b: Exponent för l (anteckningen: 0,39) [–] |
 | Giltighetsområde | B > 0, l > 0, K > 0. Giltighetsområdet är okänt – ange det från din källa i kalkylatorn. |
 | Antaganden | Anteckningens exempel säger ”λ 40 %” och ”40 % av B = 1,6” med B = 2 m. 40 % av 2 m är 0,8 m, inte 1,6 m. Tolkningen ändrar t med en faktor 2 och har inte avgjorts – ange därför λ själv, i procent av B eller direkt i meter. Vilken fysikalisk storhet v är har inte fastställts. Bergmassans/försättningens rörelsehastighet, partikelhastighet (vibration) och vågutbredningshastighet är olika storheter. K gäller bara för de enheter modellen har tagits fram för – enligt anteckningen B i meter och l i kg/m. Därför är B och l låsta till de enheterna. Exponenterna 1,17 och 0,39 är avlästa från en handskriven anteckning. |
 | Källa | Användarens egna handskrivna anteckningar (daterade 2024-12-27). Ingen fackkälla angiven. |
 | Verifieringsstatus | EJ VERIFIERAD. Kontrollerat: v räknat med anteckningens exempelindata återger anteckningens eget exempelvärde för v, och t räknas som kvoten λ/v. Anteckningens λ-exempel är inkonsekvent och har inte avgjorts. Modellens fysikaliska innebörd, enheter och giltighetsområde är inte belagda i någon fackkälla. Kräver granskning av behörig person innan resultat används. |
 | Granskning | EJ VERIFIERAD. Endast aritmetiken kontrollerad. Oberoende säkerhetsgranskning 2026-10-14: enheter låsta (B i m, l i kg/m), precisionen begränsad till 3 siffror och statusen följer med resultatet i kopior, listor och rapporter. |
 | Kalkylator | `blast_model` |
-| Tester som anropar kalkylatorn | 14 |
+| Tester som anropar kalkylatorn | 17 |
 
 #### Kvot t = λ / v (egen modell – inte ett tändintervall) — `blast_t` (v1.0)
 
@@ -1001,5 +1001,5 @@ Källhänvisningen har preciserats för 61 formler (version 1.1). Innehållsliga
 | Verifieringsstatus | EJ VERIFIERAD. Kontrollerat: v räknat med anteckningens exempelindata återger anteckningens eget exempelvärde för v, och t räknas som kvoten λ/v. Anteckningens λ-exempel är inkonsekvent och har inte avgjorts. Modellens fysikaliska innebörd, enheter och giltighetsområde är inte belagda i någon fackkälla. Kräver granskning av behörig person innan resultat används. |
 | Granskning | EJ VERIFIERAD. Endast kvoten kontrollerad. Anteckningens λ-exempel är inkonsekvent (40 % av 2 m = 0,8 m, inte 1,6 m) och avgörs inte av appen. Säkerhetsgranskning 2026-10-14: t benämns inte fördröjning, söks inte på tändsekvens och anges som ”inte ett tändintervall”. |
 | Kalkylator | `blast_model` |
-| Tester som anropar kalkylatorn | 14 |
+| Tester som anropar kalkylatorn | 17 |
 
