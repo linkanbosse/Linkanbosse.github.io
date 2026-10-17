@@ -13,6 +13,14 @@ Den här mappen är en liten server som tar betalt för diamanter via **Stripe**
 
 Pengarna hamnar på ditt Stripe-konto och betalas ut till ditt bankkonto.
 
+## Managed Payments (Stripe sköter momsen)
+
+Servern använder Stripes **Managed Payments**. Då är det Stripe som säljer diamanterna åt dig och tar hand om moms, bedrägerikontroll och kundfrågor om köpet. Du får pengarna minus Stripes avgift.
+
+- Stäng av det genom att sätta `MANAGED_PAYMENTS = "false"` i `wrangler.toml`.
+- Om Stripe inte godkänner Managed Payments för ditt konto görs ett vanligt köp i stället. Då är det du som ansvarar för momsen. Det syns i Cloudflare-loggen ("Managed Payments nekades").
+- Produkten får skattekoden i `TAX_CODE`. Kolla i Stripe (Settings → Tax → Product tax codes) vilken kod som passar digitala spelvaror och byt om det behövs.
+
 ## Kostnad
 
 - GitHub Pages och Cloudflare Workers: gratis (Cloudflare tillåter 100 000 anrop om dagen gratis).

@@ -1265,7 +1265,7 @@ async function startPurchase(p,btn){
   if(!PAY_URL)return;
   btn.disabled=true;btn.textContent='Öppnar…';save();
   try{const r=await payCall('/checkout',{pack:p.id});
-    if(r.ok&&r.data.url){location.href=r.data.url;return}
+    if(r.ok&&r.data.url){if(r.data.id){if(!S.pending)S.pending=[];if(!S.pending.includes(r.data.id))S.pending.push(r.data.id);S.pendingAt=S.pendingAt||{};S.pendingAt[r.data.id]=Date.now();save()}location.href=r.data.url;return}
     toast('Betalningen kunde inte startas. Försök igen om en stund.')}
   catch(e){toast('Ingen kontakt med betalservern. Kolla internet och försök igen.')}
   btn.disabled=false;btn.textContent=p.price;
@@ -1283,7 +1283,7 @@ async function claimPurchase(){
           h('div',{class:'panel'},h('div',{class:'k'},'Du fick'),h('div',{class:'big',html:gemHTML(r.data.gems)})),
           h('div',{class:'btns'},h('button',{class:'btn green ol',on:{click:closeModal}},'Hämta'))]});}
       else if(r.status===409||r.status===400||r.status===404){S.pending=S.pending.filter(x=>x!==sid);save()}
-      else if(r.status===402){S.pending=S.pending.filter(x=>x!==sid);save();toast('Köpet blev inte betalt, så inga diamanter drogs.')}
+      else if(r.status===402){const t=(S.pendingAt&&S.pendingAt[sid])||0;if(Date.now()-t>86400000){S.pending=S.pending.filter(x=>x!==sid);save()}}
     }catch(e){/* försök igen nästa gång spelet öppnas */}
   }
 }

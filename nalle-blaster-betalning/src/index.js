@@ -7,9 +7,15 @@
 // Varje köp kan bara hämtas en gång: när diamanterna lämnats ut märks betalningen
 // med metadata "claimed" hos Stripe, så ingen databas behövs.
 // Den hemliga Stripe-nyckeln ligger som hemlighet i Cloudflare (STRIPE_SECRET_KEY), aldrig i koden.
+//
+// Managed Payments: när MANAGED_PAYMENTS = "true" blir Stripe säljare och sköter moms,
+// bedrägerikontroll och kundsupport. Det kräver API-versionen nedan och en skattekod på produkten.
+// Godkänner Stripe inte Managed Payments för kontot görs ett vanligt köp i stället.
 
 // Priser i ören (1000 = 10 kr). Ändra här om du vill ha andra paket.
 // Paketnamnen (p100 osv.) måste vara samma som i spelets PAY_PACKS.
+const MANAGED_API_VERSION = '2026-02-25.preview';
+
 const PACKS = {
   p100: { gems: 100, ore: 1000, name: '100 diamanter' },
   p300: { gems: 300, ore: 2500, name: '300 diamanter' },
@@ -50,9 +56,18 @@ export default {
       f.set('payment_intent_data[metadata][pack]', body.pack);
       f.set('success_url', gameUrl + '?kop={CHECKOUT_SESSION_ID}');
       f.set('cancel_url', gameUrl);
-      const s = await stripe(env, 'POST', '/v1/checkout/sessions', f);
+      f.set('line_items[0][price_data][product_data][tax_code]', env.TAX_CODE || 'txcd_10103100');
+      let s;
+      let managed = env.MANAGED_PAYMENTS === 'true';
+      if (managed) {
+        const mf = new URLSearchParams(f);
+        mf.set('managed_payments[enabled]', 'true');
+        s = await stripe(env, 'POST', '/v1/checkout/sessions', mf, MANAGED_API_VERSION);
+        if (!s.url) { console.log('Managed Payments nekades, gör vanligt köp:', s.error && s.error.message); managed = false; }
+      }
+      if (!managed) s = await stripe(env, 'POST', '/v1/checkout/sessions', f);
       if (!s.url) return json({ error: 'stripe', detail: s.error && s.error.message }, 502);
-      return json({ url: s.url });
+      return json({ url: s.url, id: s.id, managed });
     }
 
     if (path === '/claim') {
@@ -77,12 +92,13 @@ export default {
   },
 };
 
-async function stripe(env, method, path, form) {
+async function stripe(env, method, path, form, version) {
   const res = await fetch('https://api.stripe.com' + path, {
     method,
     headers: {
       Authorization: 'Bearer ' + env.STRIPE_SECRET_KEY,
       ...(form ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}),
+      ...(version ? { 'Stripe-Version': version } : {}),
     },
     body: form ? form.toString() : undefined,
   });
