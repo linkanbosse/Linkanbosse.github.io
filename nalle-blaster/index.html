@@ -200,6 +200,11 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 .aq{background:#fff3cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;padding:4px;font-size:11.5px;font-weight:600;text-align:center;line-height:1.15}
 .aq canvas{width:56px;height:34px}
 .btn.wide{width:100%}
+.coderow{display:flex;gap:8px;width:100%}
+.codein{flex:1;min-width:0;font:600 16px var(--font);padding:7px 10px;border:3px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink)}
+.codein:focus{outline:3px solid var(--honey);outline-offset:1px}
+.codemsg{font-size:13px;font-weight:600;min-height:1.3em;text-align:center}
+.codemsg.ok{color:#3f8a24}.codemsg.err{color:#c0392b}
 @media (max-height:740px){.tool{width:54px;height:47px}.tool .e{font-size:18px}.tool .t{font-size:11px}.tool.big{width:58px;height:54px}.col{gap:7px}}
 @media (prefers-reduced-motion: reduce){.dot.show,.modal,.card.bump{animation:none}}
 </style>
@@ -1693,10 +1698,44 @@ function showFishing(){
     requestAnimationFrame(loop)};
   requestAnimationFrame(loop);
 }
+/* --- koder --- */
+function redeemCode(raw){
+  const c=String(raw||'').trim().toLowerCase().replace(/\s+/g,'').replace(/[åä]/g,'a').replace(/ö/g,'o');
+  if(!c)return{ok:false,msg:'Skriv in en kod först.'};
+  if(!c.startsWith('mila'))return{ok:false,msg:'Koden måste börja med Mila.'};
+  const r=c.slice(4);let m;
+  const num=x=>Math.min(1e12,Math.max(0,parseInt(x,10)||0));
+  if(/^\d+$/.test(r)){const n=num(r);if(!n)return{ok:false,msg:'Skriv ett antal efter Mila, till exempel Mila500.'};S.gems+=n;return{ok:true,msg:`+${fmt(n)} diamanter!`}}
+  if((m=r.match(/^(?:diamanter|gems)(\d+)$/))){const n=num(m[1]);S.gems+=n;return{ok:true,msg:`+${fmt(n)} diamanter!`}}
+  if((m=r.match(/^pengar(\d+)$/))){const n=num(m[1]);addMoney(n);return{ok:true,msg:`+${fmt(n)} pengar!`}}
+  if((m=r.match(/^varld(\d+)$/))){const n=clamp(num(m[1]),1,99);S.world=n;S.sub=1;S.maxWorld=Math.max(S.maxWorld||1,n);endEvent(true);idleStash=null;if(mode==='idle')setupIdle();return{ok:true,msg:`Du är nu i värld ${n}. ${REG.filter(x=>x.need<=n).length} regioner är öppna.`}}
+  const unlockBears=()=>{let n=0;for(const k in COMP)if(!S.bears[k]){S.bears[k]={stars:1,dup:0};n++}S.team=S.team.map((x,i)=>x);for(let i=0;i<3;i++){if(!S.team[i]){const free=Object.keys(COMP).find(k=>!S.team.includes(k));if(free)S.team[i]=free}}buildHelpers();placeHelpers();return n};
+  const unlockSkins=()=>{let n=0;for(const k in SKINS)if(!SKINS[k].hidden&&!S.skins.includes(k)){S.skins.push(k);n++}return n};
+  const unlockGuns=()=>{let n=0;for(const k in GUNS)if(!S.guns.includes(k)){S.guns.push(k);n++}return n};
+  switch(r){
+    case 'bjornar':case 'skins':return{ok:true,msg:`Alla björnar i Björnar är upplåsta (${unlockSkins()} nya).`};
+    case 'vapen':return{ok:true,msg:`Alla vapen är upplåsta (${unlockGuns()} nya).`};
+    case 'gang':case 'ganget':case 'kompisar':return{ok:true,msg:`Hela Björngänget är upplåst (${unlockBears()} nya).`};
+    case 'stjarnor':{unlockBears();for(const k in S.bears){S.bears[k].stars=5;S.bears[k].dup=0}return{ok:true,msg:'Alla kompisar har nu 5 stjärnor!'}}
+    case 'maskar':S.worms=MAX_WORMS;S.wormAt=Date.now();return{ok:true,msg:'Maskburken är full igen.'};
+    case 'raseri':if(mode!=='idle'&&mode!=='challenge')return{ok:false,msg:'Raseri fungerar bara när du spelar.'};startRage();return{ok:true,msg:'RASERI! Stäng rutan och se björnen gå loss.'};
+    case 'vaxa':if(S.evo.stage>=3)return{ok:false,msg:'Björnen är redan legendarisk.'};S.evo.xp=Math.max(S.evo.xp,EVO_NEED[S.evo.stage]);return{ok:true,msg:'Björnen är redo att växa! Stäng rutan för att välja väg.'};
+    case 'gava':S.giftAt=0;return{ok:true,msg:'En ny gratis gåva väntar i Butiken.'};
+    case 'handelse':if(mode!=='idle')return{ok:false,msg:'Händelser fungerar bara i vanligt läge.'};if(ev)return{ok:false,msg:'En händelse pågår redan.'};startEvent();return ev?{ok:true,msg:'En händelse har startat!'}:{ok:false,msg:'Försök igen om en stund.'};
+    case 'allt':{const a=unlockSkins()+unlockGuns()+unlockBears();S.world=Math.max(S.world,5);S.sub=Math.max(1,S.sub);S.maxWorld=Math.max(S.maxWorld||1,5);idleStash=null;if(mode==='idle')setupIdle();buildHelpers();placeHelpers();return{ok:true,msg:`Allt är upplåst: björnar, vapen, hela gänget och alla regioner (${a} nya saker).`}}
+  }
+  return{ok:false,msg:'Okänd kod. Kolla stavningen.'};
+}
 function showSettings(confirmReset){
   openModal({title:'Inställningar',body:[
     h('div',{class:'item'},h('div',{class:'info'},h('div',{class:'nm'},'Ljud'),h('div',{class:'ds'},S.sound?'Ljudet är på':'Ljudet är av')),
       h('button',{class:'btn sm '+(S.sound?'green':'grey'),on:{click:()=>{S.sound=!S.sound;audio();save();showSettings()}}},S.sound?'På':'Av')),
+    (()=>{const inp=h('input',{class:'codein',id:'codeInput',type:'text',placeholder:'Skriv kod här',autocomplete:'off',autocapitalize:'off',spellcheck:'false','aria-label':'Kod'});
+      const msg=h('div',{class:'codemsg',role:'status'});
+      const go=()=>{const res=redeemCode(inp.value);msg.textContent=res.msg;msg.className='codemsg '+(res.ok?'ok':'err');if(res.ok){inp.value='';sfx.chest();save();updateUI()}else sfx.lose()};
+      inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go()}});
+      return h('div',{class:'panel',style:'align-items:stretch'},h('div',{style:'font-weight:700;font-size:16px;text-align:left'},'🔑 Koder'),
+        h('div',{class:'coderow'},inp,h('button',{class:'btn sm green ol',on:{click:go}},'Lös in')),msg)})(),
     h('div',{class:'item'},h('div',{class:'info'},h('div',{class:'nm'},'Musik'),h('div',{class:'ds'},S.music?'Musiken är på':'Musiken är av')),
       h('button',{class:'btn sm '+(S.music?'green':'grey'),on:{click:()=>{S.music=!S.music;if(S.music){audio();startMusic()}else stopMusic();save();showSettings()}}},S.music?'På':'Av')),
     h('div',{class:'item'},h('div',{class:'info'},h('div',{class:'nm'},'Statistik'),h('div',{class:'ds'},`${fmt(S.stats.trees)} träd fällda · ${S.stats.chests} kistor · ${S.stats.events} händelser · ${S.stats.fish||0} fiskar · ${S.rebirths} återfödelser`))),
@@ -1739,7 +1778,7 @@ cv.addEventListener('pointermove',e=>{if(e.pointerId!==input.id)return;let dx=e.
 const endJoy=e=>{if(e.pointerId!==input.id)return;input.id=null;input.dx=input.dy=0;joy.style.display='none'};
 cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',endJoy);
 document.addEventListener('pointerdown',()=>audio(),{passive:true});
-addEventListener('keydown',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;keys.add(k);if(k.startsWith('Arrow'))e.preventDefault()});
+addEventListener('keydown',e=>{if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;const k=e.key.length===1?e.key.toLowerCase():e.key;keys.add(k);if(k.startsWith('Arrow'))e.preventDefault()});
 addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;keys.delete(k)});
 addEventListener('blur',()=>keys.clear());
 addEventListener('resize',resize);
