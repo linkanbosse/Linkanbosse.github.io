@@ -6,3 +6,14 @@
 - `bear_sheet.json` – rutstorlek, ankarpunkt och animationer.
 
 Spelet (`../index.html`) har arket inbakat som data-URI, så filerna här behövs inte för att spelet ska fungera.
+
+## 3D-björnen (standard)
+
+- `bear_backpack.glb` – 3D-modellen, skapad av spelets ägare med ChatGPT (73 delar, inga animationer).
+- `bake_backpack_bear.py` + `render3d.py` – animerar delarna (ben, armar, huvud, kropp) och renderar 33 bilder
+  med cel-skuggning och kontur. Körs med `python3 bake_backpack_bear.py` (numpy, Pillow, scipy).
+- `bear3d_sheet.png` – färgark (768×896, celler 128×128, samma rader som pixelbjörnen).
+- `bear3d_mask.png` – mask för björnfärger: röd = päls, grön = mage/nos, blå = armar/ben/öron.
+- `bear3d_sheet.json` – ankare (fötter), framtass för vapnet och huvudets topp.
+
+I spelet väljer man stil under Inställningar → Björnstil.

@@ -1,0 +1,1 @@
+{"cell": [128, 128], "anchor": [59.2, 117.7], "hand": [25.0, -59.3], "head": [1.9, -73.4], "headTop": -98.6, "anims": {"idle": {"row": 0, "frames": 4}, "walk": {"row": 1, "frames": 6}, "run": {"row": 2, "frames": 6}, "attack": {"row": 3, "frames": 6}, "hurt": {"row": 4, "frames": 3}, "cheer": {"row": 5, "frames": 2}, "faint": {"row": 6, "frames": 6}}}
