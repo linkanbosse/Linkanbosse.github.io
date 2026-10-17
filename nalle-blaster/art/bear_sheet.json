@@ -1,0 +1,1 @@
+{"cell": [102, 73], "anchor": [35, 68], "anims": {"idle": {"row": 0, "frames": 4}, "walk": {"row": 1, "frames": 6}, "run": {"row": 2, "frames": 6}, "attack": {"row": 3, "frames": 6}, "hurt": {"row": 4, "frames": 3}, "cheer": {"row": 5, "frames": 2}, "faint": {"row": 6, "frames": 6}}}
