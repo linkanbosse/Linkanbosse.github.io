@@ -200,6 +200,14 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 .aq{background:#fff3cf;border-radius:12px;display:flex;flex-direction:column;align-items:center;padding:4px;font-size:11.5px;font-weight:600;text-align:center;line-height:1.15}
 .aq canvas{width:56px;height:34px}
 .btn.wide{width:100%}
+.wheelcv{width:100%;max-width:340px;aspect-ratio:340/356;align-self:center;display:block}
+.wincard{background:var(--cream-deep);border-radius:14px;padding:10px 12px;display:flex;align-items:center;justify-content:center;gap:10px;min-height:64px}
+.wincard.won{justify-content:flex-start;animation:pop .35s cubic-bezier(.3,1.6,.6,1)}
+.wincard.jackpot{background:linear-gradient(#ffe7a0,#ffc23a)}
+.winart{width:96px;height:96px;flex:none}
+.wtext{flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:2px}
+.wtext .note{text-align:left}
+.wtitle{font-size:26px;font-weight:700;line-height:1.05;font-variant-numeric:tabular-nums}
 .digGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;width:100%}
 .dig{aspect-ratio:1;border-radius:10px;border:2.5px solid var(--ink);background:linear-gradient(#f3d891,#d9b25a);font-size:22px;box-shadow:0 3px 0 var(--ink);display:grid;place-items:center;padding:0}
 .dig:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
@@ -1910,57 +1918,316 @@ function showDaily(){
     h('div',{class:'btns'},h('button',{class:'btn green ol',on:{click:()=>{const d=DAILY[next-1];S.daily.day=next;S.daily.last=dayStr(new Date());if(d.give)d.give();save();sfx.chest();burstConfetti();
       if(d.jar!=null)openJar(JARS[d.jar],true);else{closeModal();toast('Dagens belöning: '+d.txt)}}}},'Hämta dag '+next))]});
 }
+/* ================= Lyckohjulet =================
+   Grafik: originalillustrationer i SVG (inbäddade som data-URI, inga externa filer).
+   Rendering: hjulskivan och den stillastående ramen ritas en gång till egna canvasar,
+   varje bildruta roterar bara skivan och ritar lampor, pil och vinstljus ovanpå. */
+const lg=(id,a,b,x2,y2)=>`<linearGradient id="${id}" x1="0" y1="0" x2="${x2==null?0:x2}" y2="${y2==null?1:y2}"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+const svgDoc=(defs,body)=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128"><defs>${defs}</defs>${body}</svg>`;
+const gemSvg=(tx,ty,s,id,line)=>`<g transform="translate(${tx} ${ty}) scale(${s})"><path d="M14 22L24 10H40L50 22L32 54Z" fill="url(#${id})" stroke="${line}" stroke-width="3.4" stroke-linejoin="round"/><path d="M14 22H50M24 10L28 22L32 54M40 10L36 22L32 54" fill="none" stroke="${line}" stroke-width="1.8" stroke-linejoin="round" opacity=".45"/><path d="M24 10L28 22H14Z" fill="#fff" opacity=".65"/><path d="M28 22H36L32 54Z" fill="#fff" opacity=".22"/><circle cx="21" cy="16" r="2.1" fill="#fff"/></g>`;
+const sparkSvg=(x,y,r)=>`<path d="M${x} ${y-r}L${x+r*.28} ${y-r*.28}L${x+r} ${y}L${x+r*.28} ${y+r*.28}L${x} ${y+r}L${x-r*.28} ${y+r*.28}L${x-r} ${y}L${x-r*.28} ${y-r*.28}Z" fill="#fff"/>`;
+const PRIZE_SVG={
+  gem:svgDoc(lg('g','#dff9ff','#2a8fd8'),gemSvg(0,1,1,'g','#163a5c')+sparkSvg(52,14,5)),
+  gems:svgDoc(lg('a','#f3dcff','#8a4ad8')+lg('b','#d9fff2','#18a884')+lg('c','#dff9ff','#2a8fd8'),
+    gemSvg(-5,19,.62,'a','#3a1a6a')+gemSvg(25,19,.62,'b','#0f4a3a')+gemSvg(9,0,.72,'c','#163a5c')+sparkSvg(54,10,5)+sparkSvg(8,14,3.5)),
+  bills:svgDoc(lg('m','#8fe06a','#3f9a32'),
+    `<g transform="rotate(-14 32 34)"><rect x="9" y="24" width="46" height="26" rx="5" fill="#357f2a" stroke="#1f4d18" stroke-width="3"/></g>
+     <rect x="9" y="17" width="46" height="27" rx="5" fill="url(#m)" stroke="#1f4d18" stroke-width="3"/>
+     <rect x="14" y="22" width="36" height="17" rx="3" fill="none" stroke="#2f7d24" stroke-width="1.6" opacity=".7"/>
+     <circle cx="38" cy="30.5" r="6" fill="#2f7d24" opacity=".55"/><path d="M35.5 30.5l2 2.2 3.6-4.4" fill="none" stroke="#e9ffd8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+     <rect x="20" y="14" width="8" height="33" rx="1.5" fill="#ffcf45" stroke="#8a5a12" stroke-width="2.2"/>
+     <rect x="12" y="20" width="6" height="3" rx="1.5" fill="#fff" opacity=".55"/>`),
+  ticket:svgDoc(lg('t','#ff9cc0','#e5486e'),
+    `<g transform="rotate(-12 32 32)"><path d="M7 19H57V27A5 5 0 0 0 57 37V45H7V37A5 5 0 0 0 7 27Z" fill="url(#t)" stroke="#7a1d3a" stroke-width="3" stroke-linejoin="round"/>
+     <line x1="21" y1="21" x2="21" y2="43" stroke="#7a1d3a" stroke-width="2.2" stroke-dasharray="3 3"/>
+     <path d="M39 22.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z" fill="#ffe066" stroke="#8a5a12" stroke-width="1.8" stroke-linejoin="round"/>
+     <rect x="10" y="22" width="8" height="3" rx="1.5" fill="#fff" opacity=".55"/></g>`),
+  jar:svgDoc(lg('h','#ffd85a','#e08a12'),
+    `<rect x="14" y="18" width="36" height="40" rx="13" fill="url(#h)" stroke="#5a3a12" stroke-width="3"/>
+     <path d="M17 21h30v4c-2 0-3 5-5 5s-2-3-4-3-2 6-5 6-2-5-4-5-3 3-5 3-2-4-4-4z" fill="#ffe28a" opacity=".9"/>
+     <rect x="11" y="9" width="42" height="11" rx="4" fill="#9a5d2c" stroke="#5a3a12" stroke-width="3"/>
+     <rect x="14" y="11" width="18" height="3" rx="1.5" fill="#fff" opacity=".35"/>
+     <rect x="20" y="33" width="24" height="18" rx="5" fill="#fff3cf" stroke="#5a3a12" stroke-width="2.2"/>
+     <circle cx="27.5" cy="37.5" r="2.8" fill="#b98552" stroke="#5b3a20" stroke-width="1.2"/><circle cx="36.5" cy="37.5" r="2.8" fill="#b98552" stroke="#5b3a20" stroke-width="1.2"/>
+     <circle cx="32" cy="42.5" r="6" fill="#b98552" stroke="#5b3a20" stroke-width="1.4"/><ellipse cx="32" cy="45" rx="3" ry="2.2" fill="#f3dfc4"/>
+     <circle cx="29.7" cy="41.3" r="1" fill="#2a1d14"/><circle cx="34.3" cy="41.3" r="1" fill="#2a1d14"/><circle cx="32" cy="44.2" r="1" fill="#2a1d14"/>
+     <rect x="17.5" y="23" width="4.5" height="28" rx="2.2" fill="#fff" opacity=".45"/>`),
+  coin2:svgDoc(lg('c','#fff2a0','#f0a818'),
+    `<circle cx="32" cy="35" r="23" fill="#c9840e" stroke="#7a4a08" stroke-width="3"/>
+     <circle cx="32" cy="31" r="23" fill="url(#c)" stroke="#7a4a08" stroke-width="3"/>
+     <circle cx="32" cy="31" r="17" fill="none" stroke="#c98a12" stroke-width="2.4"/>
+     <path d="M15 27l8 8M23 27l-8 8" stroke="#7a4a08" stroke-width="4" stroke-linecap="round"/>
+     <path d="M29 24.5c0-5 4-7.5 8-7.5s8 2.5 8 7c0 4.5-4 7-8 10.5l-7.5 6.5H46" fill="none" stroke="#7a4a08" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+     <path d="M29 24.5c0-5 4-7.5 8-7.5s8 2.5 8 7c0 4.5-4 7-8 10.5l-7.5 6.5H46" fill="none" stroke="#fff2a0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+     <path d="M17 22a17 17 0 0 1 9-8" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"/>`+sparkSvg(52,12,5)),
+  worm:svgDoc('',
+    `<ellipse cx="30" cy="54" rx="22" ry="4" fill="#000" opacity=".15"/>
+     <path d="M9 44q8-15 18-4t18-6q4-8 10-5" fill="none" stroke="#8a3a5a" stroke-width="14" stroke-linecap="round"/>
+     <path d="M9 44q8-15 18-4t18-6q4-8 10-5" fill="none" stroke="#ff9cbc" stroke-width="9.5" stroke-linecap="round"/>
+     <path d="M15 35l3 4M24 35l-1 5M33 41l2-5M41 36l-3 4" stroke="#e0708f" stroke-width="2" stroke-linecap="round"/>
+     <circle cx="51.5" cy="27" r="3" fill="#fff"/><circle cx="57" cy="27.5" r="2.6" fill="#fff"/>
+     <circle cx="52" cy="27.4" r="1.5" fill="#2a1d14"/><circle cx="57.3" cy="27.8" r="1.3" fill="#2a1d14"/>
+     <path d="M52 32q2.5 2 5 0" fill="none" stroke="#8a3a5a" stroke-width="1.6" stroke-linecap="round"/>
+     <path d="M12 39q3-6 8-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".6"/>`),
+  chest:svgDoc(lg('w','#c98a4a','#7a4420')+lg('l','#d99a5a','#9a5d2c'),
+    `<circle cx="17" cy="21" r="5" fill="#ffd84d" stroke="#8a5a12" stroke-width="2"/><circle cx="25" cy="16" r="5" fill="#ffd84d" stroke="#8a5a12" stroke-width="2"/>
+     <circle cx="44" cy="17" r="5" fill="#ffd84d" stroke="#8a5a12" stroke-width="2"/><circle cx="49" cy="23" r="4.5" fill="#ffd84d" stroke="#8a5a12" stroke-width="2"/>
+     <path d="M30 8L34 4H40L44 8L37 18Z" fill="#7fd6ff" stroke="#163a5c" stroke-width="2" stroke-linejoin="round"/>
+     <path d="M8 31Q32 6 56 31Z" fill="url(#l)" stroke="#3e2412" stroke-width="3" stroke-linejoin="round"/>
+     <rect x="8" y="30" width="48" height="25" rx="3" fill="url(#w)" stroke="#3e2412" stroke-width="3"/>
+     <rect x="8" y="36" width="48" height="4.5" fill="#ffcf45" stroke="#8a5a12" stroke-width="1.6"/>
+     <rect x="27.5" y="20" width="9" height="35" rx="1.5" fill="#ffcf45" stroke="#8a5a12" stroke-width="2"/>
+     <rect x="28.5" y="38" width="7" height="8" rx="2" fill="#fff6c0" stroke="#8a5a12" stroke-width="1.6"/><circle cx="32" cy="41.5" r="1.3" fill="#8a5a12"/>
+     <rect x="11" y="43" width="4" height="9" rx="2" fill="#fff" opacity=".3"/>`+sparkSvg(56,10,5)+sparkSvg(9,10,3.5)),
+  bear:svgDoc('',
+    `<circle cx="15" cy="17" r="9.5" fill="#b98552" stroke="#5b3a20" stroke-width="3"/><circle cx="15" cy="17" r="4.8" fill="#e9a69c"/>
+     <circle cx="49" cy="17" r="9.5" fill="#b98552" stroke="#5b3a20" stroke-width="3"/><circle cx="49" cy="17" r="4.8" fill="#e9a69c"/>
+     <circle cx="32" cy="36" r="23" fill="#b98552" stroke="#5b3a20" stroke-width="3"/>
+     <ellipse cx="32" cy="45" rx="11" ry="8" fill="#f3dfc4"/>
+     <ellipse cx="32" cy="41.5" rx="4.4" ry="3" fill="#2a1d14"/>
+     <circle cx="22.5" cy="32" r="3.4" fill="#2a1d14"/><circle cx="41.5" cy="32" r="3.4" fill="#2a1d14"/>
+     <circle cx="23.6" cy="30.8" r="1.2" fill="#fff"/><circle cx="42.6" cy="30.8" r="1.2" fill="#fff"/>
+     <ellipse cx="17" cy="41" rx="4.5" ry="2.8" fill="#ff8fa0" opacity=".55"/><ellipse cx="47" cy="41" rx="4.5" ry="2.8" fill="#ff8fa0" opacity=".55"/>
+     <path d="M27.5 47q2.2 3 4.5 0q2.3 3 4.5 0" fill="none" stroke="#2a1d14" stroke-width="2" stroke-linecap="round"/>
+     <path d="M18 22a22 22 0 0 1 10-7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".35"/>`)
+};
+const PRIZE_IMG={};
+let prizeArtReady=null;
+const svgURI=svg=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+function loadPrizeArt(){
+  if(prizeArtReady)return prizeArtReady;
+  prizeArtReady=Promise.all(Object.entries(PRIZE_SVG).map(([k,svg])=>new Promise(res=>{const img=new Image();img.onload=()=>{PRIZE_IMG[k]=img;res()};img.onerror=()=>res();img.src=svgURI(svg)})));
+  return prizeArtReady;
+}
+function drawPrize(c,k,x,y,size){const img=PRIZE_IMG[k];if(img&&img.complete&&img.naturalWidth)c.drawImage(img,x-size/2,y-size/2,size,size)}
+function prizeImgEl(k,size){const im=h('img',{src:svgURI(PRIZE_SVG[k]),width:String(size),height:String(size),alt:''});im.style.cssText=`width:${size}px;height:${size}px;vertical-align:middle;flex:none`;return im}
+
+function mixHex(hex,amt){ // amt<0 mot svart, amt>0 mot vitt
+  const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const t=amt<0?0:255,k=Math.abs(amt);
+  r=Math.round(r+(t-r)*k);g=Math.round(g+(t-g)*k);b=Math.round(b+(t-b)*k);return `rgb(${r},${g},${b})`;
+}
 const WHEEL=[
-  {label:'25 💎',col:'#5ce0ff',w:22,give(){S.gems+=25;return '25 diamanter'}},
-  {label:'Pengar',col:'#7be06b',w:20,give(){const m=Math.max(baseMoney()*200,(S.mps||0)*240);addMoney(m);return fmt(m)+' pengar'}},
-  {label:'3 🎟️',col:'#ffcf45',w:14,give(){S.tickets+=3;return '3 biljetter'}},
-  {label:'🍯 Burk',col:'#ffa53a',w:10,jar:0,give(){return 'en honungsburk med en björnkompis'}},
-  {label:'2× pengar',col:'#ff8ac0',w:12,give(){S.boosts.money=Math.max(Date.now(),S.boosts.money)+300000;return '2× pengar i 5 minuter'}},
-  {label:'🪱 Maskar',col:'#c9a06a',w:10,give(){S.worms=MAX_WORMS;return 'full maskburk'}},
-  {label:'100 💎',col:'#a26cff',w:8,give(){S.gems+=100;return '100 diamanter'}},
-  {label:'JACKPOT',col:'#ff5a5a',w:4,give(){S.gems+=500;S.tickets+=5;return 'JACKPOT! 500 diamanter och 5 biljetter'}}
+  {label:'25 DIAMANTER',short:'25',icon:'gem',col:'#3b9ff0',w:22,give(){S.gems+=25;return{title:'25 diamanter',n:25,unit:'diamanter'}}},
+  {label:'PENGAR',icon:'bills',col:'#47b83e',w:20,give(){const m=Math.max(baseMoney()*200,(S.mps||0)*240);addMoney(m);return{title:fmt(m)+' pengar',sub:'Rakt in i plånboken'}}},
+  {label:'3 BILJETTER',short:'3 ST',icon:'ticket',col:'#ff8a34',w:14,give(){S.tickets+=3;return{title:'3 biljetter',n:3,unit:'biljetter',sub:'Till fler bonusspel'}}},
+  {label:'100 DIAMANTER',short:'100',icon:'gems',col:'#8a58df',w:8,give(){S.gems+=100;return{title:'100 diamanter',n:100,unit:'diamanter'}}},
+  {label:'HONUNGSBURK',short:'BURK',icon:'jar',col:'#eaa41c',w:10,jar:0,give(){return{title:'En honungsburk',sub:'Med en björnkompis i'}}},
+  {label:'2× PENGAR',icon:'coin2',col:'#ec5590',w:12,give(){S.boosts.money=Math.max(Date.now(),S.boosts.money)+300000;return{title:'2× pengar',sub:'I 5 minuter'}}},
+  {label:'MASKAR',icon:'worm',col:'#22a99a',w:10,give(){S.worms=MAX_WORMS;S.wormAt=Date.now();return{title:'Full maskburk',sub:'Dags att fiska!'}}},
+  {label:'JACKPOT',icon:'chest',col:'#e23d3d',w:4,jackpot:true,give(){S.gems+=500;S.tickets+=5;return{title:'JACKPOT!',n:500,unit:'diamanter',sub:'och 5 biljetter'}}}
 ];
-function drawWheel(x,rot,hl){
-  const n=WHEEL.length,seg=TAU/n,cx=150,cy=150,R0=128;
-  x.clearRect(0,0,300,300);
-  x.fillStyle='#5a3a1e';circ(x,cx,cy,R0+12);x.fill();
-  for(let i=0;i<n;i++){const a0=rot+i*seg-Math.PI/2;x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,R0,a0,a0+seg);x.closePath();x.fillStyle=WHEEL[i].col;x.fill();
-    if(hl===i){x.fillStyle='rgba(255,255,255,.45)';x.fill()}x.strokeStyle='#fff';x.lineWidth=2;x.stroke();
-    {const mid=a0+seg/2,lx=cx+Math.cos(mid)*R0*.62,ly=cy+Math.sin(mid)*R0*.62;x.save();x.translate(lx,ly);x.textAlign='center';x.textBaseline='middle';x.font='700 13px Fredoka, system-ui';x.lineWidth=4;x.strokeStyle='#2a1d14';x.fillStyle='#fff';const ls=WHEEL[i].label.split(' ');ls.forEach((t2,k)=>{const yy=(k-(ls.length-1)/2)*14;x.strokeText(t2,0,yy);x.fillText(t2,0,yy)});x.restore()}}
-  for(let i=0;i<n*2;i++){const a=rot+i*seg/2-Math.PI/2;x.fillStyle=(Math.floor(T*6)+i)%2?'#ffe066':'#fff6c0';circ(x,cx+Math.cos(a)*(R0+6),cy+Math.sin(a)*(R0+6),3.2);x.fill()}
-  x.fillStyle='#ffcf45';x.strokeStyle='#5a3a1e';x.lineWidth=3;circ(x,cx,cy,22);x.fill();x.stroke();x.font='22px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText('🐻',cx,cy+1);
-  x.fillStyle='#e5484d';x.beginPath();x.moveTo(cx-14,6);x.lineTo(cx+14,6);x.lineTo(cx,34);x.closePath();x.fill();x.stroke();
+// Fältens storlek: hälften lika stort för alla, hälften efter chansen att vinna.
+// Ovanliga priser ser alltså mindre ut, så hjulet visar ungefär hur chansen är.
+const WSEG=(()=>{const n=WHEEL.length,tot=WHEEL.reduce((a,w)=>a+w.w,0);let a=0;return WHEEL.map((w,i)=>{const span=(.5/n+.5*w.w/tot)*TAU;const sg={i,start:a,span,mid:a+span/2,w};a+=span;return sg})})();
+const WR={face:132,rim:158,bulb:146,cx:170,cy:178,size:340,h:356};
+let wheelFace=null,wheelOverlay=null,wheelPx=0,wheelRays=null,bulbOn=null,bulbOff=null,pointerSpr=null,wheelBase=null;
+function sprite(w,hh,px,draw){const c=document.createElement('canvas');c.width=Math.ceil(w*px);c.height=Math.ceil(hh*px);const x=c.getContext('2d');x.scale(px,px);draw(x);return c}
+function curvedText(c,text,mid,r,size,fill,stroke){
+  c.font=`700 ${size}px Fredoka, "Baloo 2", system-ui, sans-serif`;
+  const sp=size*.06,ws=[...text].map(ch=>c.measureText(ch).width),total=ws.reduce((a,b)=>a+b,0)+sp*(ws.length-1);
+  let a=mid-total/(2*r);
+  c.textAlign='center';c.textBaseline='middle';c.lineJoin='round';
+  [...text].forEach((ch,i)=>{const aa=a+ws[i]/(2*r);c.save();c.rotate(aa);c.translate(0,-r);c.lineWidth=size*.34;c.strokeStyle=stroke;c.strokeText(ch,0,0);c.fillStyle=fill;c.fillText(ch,0,0);c.restore();a+=(ws[i]+sp)/r});
+}
+function textArcWidth(c,text,size){c.font=`700 ${size}px Fredoka, "Baloo 2", system-ui, sans-serif`;let w=0;for(const ch of text)w+=c.measureText(ch).width;return w+size*.06*(text.length-1)}
+function segPath(c,sg,r0,r1){const a0=sg.start-Math.PI/2,a1=a0+sg.span;c.beginPath();c.arc(0,0,r1,a0,a1);c.arc(0,0,r0,a1,a0,true);c.closePath()}
+function buildWheelArt(px){
+  wheelPx=px;const R=WR.face;
+  // --- roterande skiva ---
+  const D=Math.ceil((R+2)*2*px);const fc=document.createElement('canvas');fc.width=fc.height=D;const c=fc.getContext('2d');c.translate(D/2,D/2);c.scale(px,px);
+  for(const sg of WSEG){
+    const col=sg.w.col;
+    const g=c.createRadialGradient(0,0,R*.2,0,0,R);
+    if(sg.w.jackpot){g.addColorStop(0,'#8a1414');g.addColorStop(.55,'#d42c2c');g.addColorStop(.9,'#ff6a4a');g.addColorStop(1,'#ffb07a')}
+    else{g.addColorStop(0,mixHex(col,-.45));g.addColorStop(.55,col);g.addColorStop(.92,mixHex(col,.22));g.addColorStop(1,mixHex(col,.4))}
+    segPath(c,sg,0,R);c.fillStyle=g;c.fill();
+    // mjuka ränder för djup
+    c.save();segPath(c,sg,0,R);c.clip();c.strokeStyle='rgba(255,255,255,.10)';c.lineWidth=7;for(const rr of [R*.38,R*.72]){c.beginPath();c.arc(0,0,rr,0,TAU);c.stroke()}c.restore();
+    if(sg.w.jackpot){c.save();segPath(c,sg,R*.25,R);c.clip();c.globalCompositeOperation='lighter';for(let k=0;k<5;k++){const a=sg.start-Math.PI/2+sg.span*(k+.5)/5;c.strokeStyle='rgba(255,220,120,.18)';c.lineWidth=4;c.beginPath();c.moveTo(Math.cos(a)*R*.25,Math.sin(a)*R*.25);c.lineTo(Math.cos(a)*R,Math.sin(a)*R);c.stroke()}c.restore()}
+  }
+  // skiljelister i guld
+  for(const sg of WSEG){const a=sg.start-Math.PI/2,x0=Math.cos(a),y0=Math.sin(a);
+    c.lineCap='round';c.strokeStyle='#6b3e0c';c.lineWidth=5;c.beginPath();c.moveTo(x0*R*.24,y0*R*.24);c.lineTo(x0*R,y0*R);c.stroke();
+    c.strokeStyle='#ffd75a';c.lineWidth=2.4;c.stroke();
+    c.strokeStyle='rgba(255,255,255,.6)';c.lineWidth=.9;c.beginPath();c.moveTo(x0*R*.26-y0*.6,y0*R*.26+x0*.6);c.lineTo(x0*R*.98-y0*.6,y0*R*.98+x0*.6);c.stroke()}
+  // pinnar som pilen slår mot
+  for(const sg of WSEG){const a=sg.start-Math.PI/2,x0=Math.cos(a)*(R-8),y0=Math.sin(a)*(R-8);
+    c.fillStyle='rgba(0,0,0,.3)';circ(c,x0+1,y0+1.5,4.6);c.fill();
+    const pg=c.createRadialGradient(x0-1.5,y0-1.5,.5,x0,y0,4.6);pg.addColorStop(0,'#fffbe0');pg.addColorStop(.45,'#ffd23f');pg.addColorStop(1,'#a8700a');c.fillStyle=pg;circ(c,x0,y0,4.4);c.fill();c.strokeStyle='#5a3a08';c.lineWidth=1;c.stroke()}
+  // illustrationer och böjd text
+  for(const sg of WSEG){
+    const arc=sg.span*R*.58,isz=clamp(arc*.92,30,54);
+    c.save();c.rotate(sg.mid);
+    c.fillStyle='rgba(20,10,0,.25)';c.beginPath();c.ellipse(0,-R*.56+isz*.42,isz*.36,isz*.1,0,0,TAU);c.fill();
+    drawPrize(c,sg.w.icon,0,-R*.57,isz);
+    c.restore();
+    const r=R*.84,avail=sg.span*r*.86;let txt=sg.w.label,size=14;
+    let w=textArcWidth(c,txt,size);if(w>avail){size=Math.max(9.5,size*avail/w);w=textArcWidth(c,txt,size)}
+    if(w>avail&&sg.w.short){txt=sg.w.short;size=Math.min(14,size*1.25);if(textArcWidth(c,txt,size)>avail)size=Math.max(9,size*avail/textArcWidth(c,txt,size))}
+    curvedText(c,txt,sg.mid,r,size,sg.w.jackpot?'#ffe680':'#ffffff',sg.w.jackpot?'#5a0a0a':mixHex(sg.w.col,-.6));
+  }
+  // inre skugga mot navet och kantskugga
+  const ig=c.createRadialGradient(0,0,R*.2,0,0,R*.36);ig.addColorStop(0,'rgba(0,0,0,.35)');ig.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=ig;circ(c,0,0,R*.36);c.fill();
+  const eg=c.createRadialGradient(0,0,R*.86,0,0,R);eg.addColorStop(0,'rgba(0,0,0,0)');eg.addColorStop(1,'rgba(0,0,0,.28)');c.fillStyle=eg;circ(c,0,0,R);c.fill();
+  wheelFace=fc;
+  // --- stillastående ram, ljus och nav ---
+  const oc=document.createElement('canvas');oc.width=Math.ceil(WR.size*px);oc.height=Math.ceil(WR.h*px);const o=oc.getContext('2d');o.scale(px,px);o.translate(WR.cx,WR.cy);
+  // glans över skivan (ljuset kommer uppifrån vänster)
+  const sh=o.createRadialGradient(-R*.45,-R*.55,R*.05,-R*.2,-R*.3,R*1.1);sh.addColorStop(0,'rgba(255,255,255,.32)');sh.addColorStop(.45,'rgba(255,255,255,.06)');sh.addColorStop(1,'rgba(0,0,0,.18)');
+  o.fillStyle=sh;circ(o,0,0,R);o.fill();
+  // ram
+  o.save();o.beginPath();o.arc(0,0,WR.rim,0,TAU);o.arc(0,0,R,0,TAU,true);o.closePath();
+  const rg=o.createLinearGradient(0,-WR.rim,0,WR.rim);rg.addColorStop(0,'#fff0a0');rg.addColorStop(.18,'#ffcf45');rg.addColorStop(.5,'#d99a1c');rg.addColorStop(.82,'#a8700a');rg.addColorStop(1,'#7a4a08');o.fillStyle=rg;o.fill();o.restore();
+  o.strokeStyle='#5a3408';o.lineWidth=3;circ(o,0,0,WR.rim);o.stroke();circ(o,0,0,R+.5);o.stroke();
+  o.strokeStyle='rgba(255,255,255,.55)';o.lineWidth=1.5;o.beginPath();o.arc(0,0,WR.rim-3,Math.PI*1.08,Math.PI*1.75);o.stroke();
+  o.strokeStyle='rgba(90,52,8,.35)';o.lineWidth=1.2;circ(o,0,0,R+5);o.stroke();circ(o,0,0,WR.rim-5);o.stroke();
+  // lampfästen
+  for(let i=0;i<24;i++){const a=i/24*TAU-Math.PI/2,x0=Math.cos(a)*WR.bulb,y0=Math.sin(a)*WR.bulb;o.fillStyle='#6b4208';circ(o,x0,y0+.8,6);o.fill();o.fillStyle='#3a2406';circ(o,x0,y0,5.2);o.fill()}
+  // nav
+  o.fillStyle='rgba(0,0,0,.3)';circ(o,1.5,3,31);o.fill();
+  const hg=o.createRadialGradient(-8,-10,2,0,0,31);hg.addColorStop(0,'#fff6c0');hg.addColorStop(.5,'#ffcf45');hg.addColorStop(1,'#a8700a');o.fillStyle=hg;circ(o,0,0,30);o.fill();o.strokeStyle='#5a3408';o.lineWidth=2.5;o.stroke();
+  o.fillStyle='#fff3cf';circ(o,0,0,23);o.fill();o.strokeStyle='#c98a12';o.lineWidth=2;o.stroke();
+  drawPrize(o,'bear',0,1,40);
+  wheelOverlay=oc;
+  // strålar, skugga, lampor och pil ritas en gång och återanvänds varje bildruta
+  const RL=WR.size*.78;
+  wheelRays=sprite(RL*2,RL*2,px,x=>{x.translate(RL,RL);for(let i=0;i<16;i++){x.rotate(TAU/16);const g=x.createLinearGradient(0,0,0,-RL);g.addColorStop(0,'rgba(255,226,120,.6)');g.addColorStop(1,'rgba(255,226,120,0)');x.fillStyle=g;x.beginPath();x.moveTo(0,0);x.lineTo(-22,-RL);x.lineTo(22,-RL);x.closePath();x.fill()}});
+  wheelBase=sprite(WR.size,WR.h,px,x=>{const g=x.createRadialGradient(WR.cx,WR.cy+12,WR.rim*.8,WR.cx,WR.cy+12,WR.rim*1.08);g.addColorStop(0,'rgba(40,20,0,.45)');g.addColorStop(1,'rgba(40,20,0,0)');x.fillStyle=g;circ(x,WR.cx,WR.cy+12,WR.rim*1.08);x.fill()});
+  const bulb=on=>sprite(24,24,px,x=>{if(on){const gl=x.createRadialGradient(12,12,0,12,12,11);gl.addColorStop(0,'rgba(255,240,170,.95)');gl.addColorStop(1,'rgba(255,200,80,0)');x.fillStyle=gl;circ(x,12,12,11);x.fill()}
+    const bg=x.createRadialGradient(10.8,10.8,.3,12,12,4);bg.addColorStop(0,on?'#ffffff':'#fff2c0');bg.addColorStop(1,on?'#ffd23f':'#9a6a14');x.fillStyle=bg;circ(x,12,12,3.9);x.fill()});
+  bulbOn=bulb(true);bulbOff=bulb(false);
+  pointerSpr=sprite(40,64,px,x=>drawPointer(x,20,16,0));
+}
+function drawPointer(c,x,y,ang){
+  c.save();c.translate(x,y);c.rotate(ang);
+  c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.moveTo(-15,2+3);c.quadraticCurveTo(0,-8+3,15,2+3);c.lineTo(3,38+3);c.quadraticCurveTo(0,42+3,-3,38+3);c.closePath();c.fill();
+  c.beginPath();c.moveTo(-16,0);c.quadraticCurveTo(0,-12,16,0);c.lineTo(3.5,37);c.quadraticCurveTo(0,42,-3.5,37);c.closePath();
+  const pg=c.createLinearGradient(-16,0,16,0);pg.addColorStop(0,'#ff6a6a');pg.addColorStop(.5,'#e23d3d');pg.addColorStop(1,'#9a1a1a');c.fillStyle=pg;c.fill();
+  c.lineWidth=3;c.strokeStyle='#ffcf45';c.stroke();c.lineWidth=1.2;c.strokeStyle='#5a3408';c.stroke();
+  c.fillStyle='rgba(255,255,255,.55)';c.beginPath();c.moveTo(-9,-1);c.quadraticCurveTo(-4,-6,1,-6);c.lineTo(-3,26);c.closePath();c.fill();
+  const gg=c.createRadialGradient(-2,-2,.5,0,0,7);gg.addColorStop(0,'#ffffff');gg.addColorStop(.35,'#9fe6ff');gg.addColorStop(1,'#1f6fb8');c.fillStyle=gg;circ(c,0,-1,6.5);c.fill();c.strokeStyle='#ffcf45';c.lineWidth=2;c.stroke();
+  c.restore();
+}
+function wheelThumb(size){
+  const c=h('canvas',{width:size*2,height:size*2});
+  loadPrizeArt().then(()=>{if(!wheelFace)buildWheelArt(2);const x=c.getContext('2d');x.scale(2*size/WR.size,2*size/WR.size);x.translate(0,(WR.size-WR.h)/2+4);
+    x.save();x.translate(WR.cx,WR.cy);x.rotate(-.35);const fs=wheelFace.width/wheelPx;x.drawImage(wheelFace,-fs/2,-fs/2,fs,fs);x.restore();
+    x.drawImage(wheelOverlay,0,0,WR.size,WR.h);drawPointer(x,WR.cx,WR.cy-WR.rim-4,0)});
+  return c;
 }
 function showWheel(){
   refillTickets();
   const free=Date.now()>=S.wheelFreeAt;
-  const cvs=h('canvas',{class:'jarcv',width:600,height:600});
-  const res=h('div',{class:'panel',style:'min-height:52px;justify-content:center'},h('div',{class:'note'},free?'Du har en gratis snurr!':'Snurra med en biljett, eller vänta på nästa gratis snurr.'));
+  const cvs=h('canvas',{class:'wheelcv','aria-label':'Lyckohjulet'});
+  let res=h('div',{class:'wincard'},h('div',{class:'note'},free?'Du har en gratis snurr! Tryck på Snurra.':'Snurra med en biljett, eller vänta på nästa gratis snurr.'));
   const left=Math.max(0,S.wheelFreeAt-Date.now());
-  const spinBtn=h('button',{class:'btn green ol'},free?'Snurra gratis!':'Snurra (1 🎟️)');
+  const spinBtn=h('button',{class:'btn green ol'},free?'Snurra gratis!':'Snurra (1 biljett)');
   const back=h('button',{class:'btn grey',on:{click:showBonus}},'Tillbaka');
-  openModal({title:'Lyckohjulet',ribbon:'gold',body:[cvs,res,h('div',{class:'tix'},h('span',{},`🎟️ ${S.tickets} biljetter`),h('span',{},free?'Gratis snurr redo':`Gratis om ${Math.floor(left/3600000)} h ${Math.floor(left/60000)%60} min`)),h('div',{class:'btns'},back,spinBtn)]});
-  const x=cvs.getContext('2d');x.setTransform(2,0,0,2,0,0);let rot=0,spinning=false,hl=-1;
-  const idle=()=>{if(!cvs.isConnected||spinning)return;drawWheel(x,rot,hl);requestAnimationFrame(idle)};idle();
+  const tix=h('div',{class:'tix'},h('span',{style:'display:flex;align-items:center;gap:6px'},prizeImgEl('ticket',22),`${S.tickets} biljetter`),h('span',{},free?'Gratis snurr redo':`Gratis om ${Math.floor(left/3600000)} h ${Math.floor(left/60000)%60} min`));
+  openModal({title:'Lyckohjulet',ribbon:'gold',body:[cvs,res,tix,h('div',{class:'btns'},back,spinBtn)]});
+  const px=Math.min(2,Math.max(1.5,window.devicePixelRatio||2));
+  cvs.width=Math.round(WR.size*px);cvs.height=Math.round(WR.h*px);
+  const x=cvs.getContext('2d');
+  // tillstånd
+  let rot=-(WSEG[0].mid),vel=0,spinning=false,winIdx=-1,winT=0,pAng=0,pVel=0,lastRot=rot,mode2='idle',spinStart=0,from=0,to=0,over=0,tStart=0;
+  const WIND=.32,MAIN=4.6,SETTLE=.5;
+  const tick=(speed)=>beep(clamp(700+speed*40,700,1500),.025,'square',.018);
+  let ready=false;
+  loadPrizeArt().then(()=>{if(!wheelFace||wheelPx!==px)buildWheelArt(px);ready=true});
+  let last=performance.now();
+  const frame=now=>{
+    if(!cvs.isConnected)return;
+    const dt=Math.min(.05,(now-last)/1000);last=now;
+    // animation av snurret
+    if(mode2==='spin'){
+      const t=(now-tStart)/1000;
+      if(t<WIND){const k=t/WIND;rot=from-.22*Math.sin(k*Math.PI/2)}
+      else if(t<WIND+MAIN){const k=(t-WIND)/MAIN,e=1-Math.pow(1-k,4.4);rot=(from-.22)+(to+over-(from-.22))*e}
+      else if(t<WIND+MAIN+SETTLE){const k=(t-WIND-MAIN)/SETTLE;rot=to+over*(1-(1-Math.cos(k*Math.PI))/2)}
+      else{rot=to;mode2='won';winT=0;onWin()}
+    }
+    vel=(rot-lastRot)/Math.max(dt,1e-3);
+    // pilen slår mot pinnarna
+    if(Math.abs(rot-lastRot)>1e-6){for(const sg of WSEG){const b=sg.start;
+      const dRot=rot-lastRot;
+      // vinkel från "toppen" till pinnen i hjulets ram, kolla om pinnen passerade toppen denna ruta
+      const before=((b+lastRot)%TAU+TAU)%TAU,after=((b+rot)%TAU+TAU)%TAU;
+      if(dRot>0&&before>after+Math.PI){pVel-=clamp(Math.abs(vel)*.9,3,16);tick(Math.abs(vel))}
+      else if(dRot<0&&after>before+Math.PI){pVel+=clamp(Math.abs(vel)*.9,3,16);tick(Math.abs(vel))}
+    }}
+    lastRot=rot;
+    pVel+=(-pAng*180-pVel*14)*dt;pAng+=pVel*dt;pAng=clamp(pAng,-.75,.75);
+    if(mode2==='won')winT+=dt;
+    // --- rita ---
+    x.setTransform(px,0,0,px,0,0);x.clearRect(0,0,WR.size,WR.h);
+    // ljusstrålar bakom
+    if(!ready){x.fillStyle='#d99a1c';circ(x,WR.cx,WR.cy,WR.rim);x.fill();requestAnimationFrame(frame);return}
+    const rayA=mode2==='won'?.95:.4,raySpeed=mode2==='won'?.8:.15,RL=wheelRays.width/px;
+    x.save();x.translate(WR.cx,WR.cy);x.rotate(now/1000*raySpeed);x.globalAlpha=rayA;x.drawImage(wheelRays,-RL/2,-RL/2,RL,RL);x.restore();
+    x.drawImage(wheelBase,0,0,WR.size,WR.h);
+    const fs=wheelFace.width/px;
+    // rörelseoskärpa när hjulet går fort
+    const blur=clamp(Math.abs(vel)/18,0,1);
+    x.save();x.translate(WR.cx,WR.cy);
+    if(blur>.15){for(let k=2;k>=1;k--){x.save();x.globalAlpha=.28*blur;x.rotate(rot-Math.sign(vel)*k*.045*blur);x.drawImage(wheelFace,-fs/2,-fs/2,fs,fs);x.restore()}}
+    x.rotate(rot);x.globalAlpha=1;x.drawImage(wheelFace,-fs/2,-fs/2,fs,fs);
+    // vinstfältet lyser
+    if(winIdx>=0&&mode2==='won'){const sg=WSEG[winIdx];x.globalCompositeOperation='lighter';x.globalAlpha=.25+.25*Math.sin(winT*10);segPath(x,sg,WR.face*.22,WR.face);x.fillStyle='#fff6c0';x.fill();x.globalAlpha=1;x.globalCompositeOperation='source-over';
+      x.lineWidth=4;x.strokeStyle=`rgba(255,240,160,${.6+.4*Math.sin(winT*10)})`;segPath(x,sg,WR.face*.22,WR.face-2);x.stroke()}
+    x.restore();
+    x.drawImage(wheelOverlay,0,0,WR.size,WR.h);
+    // lampor
+    for(let i=0;i<24;i++){const a=i/24*TAU-Math.PI/2,bx=WR.cx+Math.cos(a)*WR.bulb,by=WR.cy+Math.sin(a)*WR.bulb;
+      let on;
+      if(mode2==='won'&&winT<3)on=(Math.floor(winT*8)+i)%2===0;
+      else if(mode2==='spin')on=(i+Math.floor(now/1000*clamp(Math.abs(vel)*1.6,4,30)))%3===0;
+      else on=(i+Math.floor(now/1000*3))%4===0||i%4===2;
+      x.drawImage(on?bulbOn:bulbOff,bx-12,by-12,24,24)}
+    x.save();x.translate(WR.cx,WR.cy-WR.rim-2);x.rotate(pAng);x.drawImage(pointerSpr,-20,-16,40,64);x.restore();
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+  let result=null;
+  function onWin(){
+    const w=WHEEL[winIdx];result=w.give();save();
+    sfx.jar();if(w.jackpot||w.w<=10)burstConfetti();if(w.jackpot){addShake(8);[523,659,784,1046,1318,1568].forEach((f,i)=>beep(f,.2,'triangle',.06,0,.5+i*.09))}
+    // vinstkort
+    res.innerHTML='';
+    const art=h('canvas',{class:'winart',width:240,height:240});
+    const card=h('div',{class:'wincard won'+(w.jackpot?' jackpot':'')},art,
+      h('div',{class:'wtext'},h('div',{class:'k'},w.jackpot?'Grattis!':'Du vann'),
+        h('div',{class:'wtitle'},result.n!=null?'0':result.title),
+        h('div',{class:'note'},result.n!=null?(result.unit+(result.sub?' '+result.sub:'')):(result.sub||''))));
+    res.replaceWith(card);res=card;
+    // räkna upp beloppet
+    if(result.n!=null){const tEl=card.querySelector('.wtitle'),t0=performance.now(),N=result.n;const up=nw=>{const k=Math.min(1,(nw-t0)/700),v=Math.round(N*(1-Math.pow(1-k,3)));tEl.textContent=String(v);if(k<1&&tEl.isConnected)requestAnimationFrame(up)};requestAnimationFrame(up)}
+    // illustrationen studsar fram med strålar
+    const ax=art.getContext('2d'),a0=performance.now();
+    const drawArt=nw=>{if(!art.isConnected)return;const t=(nw-a0)/1000;ax.setTransform(2,0,0,2,0,0);ax.clearRect(0,0,120,120);
+      ax.save();ax.translate(60,60);ax.rotate(t*.8);for(let i=0;i<12;i++){ax.rotate(TAU/12);ax.fillStyle=w.jackpot?'rgba(255,90,60,.28)':'rgba(255,207,69,.32)';ax.beginPath();ax.moveTo(0,0);ax.lineTo(-9,-62);ax.lineTo(9,-62);ax.closePath();ax.fill()}ax.restore();
+      const k=Math.min(1,t/.45),s=k<1?(1-Math.pow(1-k,3))*1.15-(k>.7?(k-.7)*.5:0):1+Math.sin(t*3)*.03;
+      drawPrize(ax,w.icon,60,60+Math.sin(t*2.4)*2,78*s);
+      if(t<1.2){ax.globalCompositeOperation='lighter';for(let i=0;i<8;i++){const aa=i/8*TAU+t,rr=20+t*60;ax.fillStyle=`rgba(255,250,220,${1-t/1.2})`;circ(ax,60+Math.cos(aa)*rr,60+Math.sin(aa)*rr,2.5);ax.fill()}ax.globalCompositeOperation='source-over'}
+      requestAnimationFrame(drawArt)};requestAnimationFrame(drawArt);
+    spinning=false;back.disabled=false;spinBtn.disabled=false;spinBtn.textContent='Snurra igen (1 biljett)';
+    tix.firstChild.lastChild.textContent=`${S.tickets} biljetter`;
+    if(w.jar!=null){spinBtn.textContent='Öppna burken!';spinBtn.onclick=()=>{spinBtn.onclick=null;openJar(JARS[w.jar],true)};}
+  }
   spinBtn.addEventListener('click',()=>{
-    if(spinning)return;
+    if(spinning||spinBtn.onclick)return;
+    if(!ready)return;
     if(Date.now()>=S.wheelFreeAt){S.wheelFreeAt=Date.now()+WHEEL_FREE_MS;S.stats.bonus=(S.stats.bonus||0)+1;missionAdd('bonus',1);save()}
     else if(!useTicket())return;
+    tix.firstChild.lastChild.textContent=`${S.tickets} biljetter`;
     spinning=true;spinBtn.disabled=true;back.disabled=true;
     const tot=WHEEL.reduce((a,w)=>a+w.w,0);let r=Math.random()*tot,idx=0;for(let i=0;i<WHEEL.length;i++){if(r<WHEEL[i].w){idx=i;break}r-=WHEEL[i].w}
-    const seg=TAU/WHEEL.length,start=rot,target=-(idx+.5)*seg+rnd(-.3,.3)*seg;
-    let end=target;while(end<start+TAU*5)end+=TAU;
-    const t0=performance.now(),dur=4200;let lastSeg=-1;
-    const spin=now=>{if(!cvs.isConnected)return;const k=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-k,4);rot=start+(end-start)*e;
-      const cs=Math.floor(((-rot%TAU)+TAU)%TAU/seg);if(cs!==lastSeg){lastSeg=cs;beep(900,.03,'square',.02)}
-      drawWheel(x,rot,-1);
-      if(k<1)requestAnimationFrame(spin);
-      else{const w=WHEEL[idx];const what=w.give();save();sfx.jar();burstConfetti();hl=idx;
-        res.innerHTML='';res.appendChild(h('div',{class:'k'},'Du vann'));res.appendChild(h('div',{class:'big',style:'font-size:20px'},what));
-        spinning=false;back.disabled=false;spinBtn.disabled=false;spinBtn.textContent='Snurra igen (1 🎟️)';
-        idle();
-        if(w.jar!=null)setTimeout(()=>{if(cvs.isConnected)openJar(JARS[w.jar],true)},1400)}};
-    requestAnimationFrame(spin);
+    winIdx=idx;const sg=WSEG[idx];
+    // landa inom fältet, inte för nära kanterna
+    const land=sg.start+sg.span*rnd(.22,.78);
+    from=rot;let target=-land;while(target<from+TAU*5)target+=TAU;to=target;over=rnd(.05,.09);
+    tStart=performance.now();mode2='spin';
+    if(res.classList.contains('won')){const n=h('div',{class:'wincard'},h('div',{class:'note'},'Snurrar…'));res.replaceWith(n);res=n}
+    else res.innerHTML='<div class="note">Snurrar…</div>';
   });
 }
 function playBalloons(){
@@ -2056,7 +2323,7 @@ function showBonus(){
     h('div',{class:'tix'},h('span',{},`🎟️ Biljetter: ${S.tickets}/${MAX_TICKETS}`),h('span',{},S.tickets>=MAX_TICKETS?'Fullt':`Ny om ${Math.floor(left/60000)}:${pad2(Math.floor(left/1000)%60)}`)),
     dailyReady()?itemRow(icon('📅'),'Dagens belöning',`Dag ${dailyNext()} av 7 är redo att hämtas!`,h('button',{class:'btn sm green',on:{click:showDaily}},'Hämta')):
       itemRow(icon('📅'),'Dagens belöning',`Du har hämtat dag ${S.daily.day}. Kom tillbaka i morgon!`,h('button',{class:'btn sm grey',disabled:''},'Hämtad')),
-    itemRow(icon('🎡'),'Lyckohjulet',free?'En gratis snurr väntar! Vinn upp till 500 💎.':'Snurra och vinn diamanter, burkar och biljetter.',h('button',{class:'btn sm '+(free?'green':''),on:{click:showWheel}},free?'Gratis!':'Snurra')),
+    itemRow(wheelThumb(58),'Lyckohjulet',free?'En gratis snurr väntar! Vinn upp till 500 💎.':'Snurra och vinn diamanter, burkar och biljetter.',h('button',{class:'btn sm '+(free?'green':''),on:{click:showWheel}},free?'Gratis!':'Snurra')),
     itemRow(icon('🎈'),'Ballongjakten',`Smäll så många ballonger du hinner på 25 sekunder. Rekord: ${S.best.balloons||0}`,h('button',{class:'btn sm',on:{click:playBalloons}},tk(1))),
     itemRow(icon('⛏️'),'Skattgrävningen','Gräv i sanden och hitta den gömda skattkistan med 7 spadtag.',h('button',{class:'btn sm',on:{click:playDig}},tk(1))),
     itemRow(icon('🎣'),'Fiskesjön',`Fiska med maskar (${S.worms}/${MAX_WORMS}).`,h('button',{class:'btn sm',on:{click:showFishing}},'Fiska')),
@@ -2126,7 +2393,8 @@ addEventListener('pagehide',save);
 setInterval(updateMoneyTarget,1500);
 
 let last=performance.now(),running=false;
-function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;update(dt);render();requestAnimationFrame(frame)}
+let bgSkip=0;
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;update(dt);bgSkip=(bgSkip+1)%3;if(!modalOpen||bgSkip===0)render();requestAnimationFrame(frame)}
 
 function start(fromHot){
   if(running)return;running=true;
@@ -2136,6 +2404,7 @@ function start(fromHot){
     if(away>90&&S.mps>0){const secs=Math.min(away,7200);const amt=S.mps*secs*.5;if(amt>=1)showWelcomeBack(amt,secs)}
   }
   last=performance.now();requestAnimationFrame(frame);
+  loadPrizeArt();
   setInterval(()=>{if(dailyReady()&&!modalOpen&&mode==='idle'&&$('trans').hidden)showDaily()},1200);
 }
 function boot(data){
