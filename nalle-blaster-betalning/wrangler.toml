@@ -1,0 +1,8 @@
+name = "nalle-blaster-betalning"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+workers_dev = true
+
+[vars]
+# Adressen där spelet ligger. Stripe skickar tillbaka spelaren hit efter köpet.
+GAME_URL = "https://linkanbosse.github.io/nalle-blaster/"

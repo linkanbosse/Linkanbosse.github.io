@@ -38,7 +38,7 @@ jobs:
         if: hashFiles('package.json') == ''
         run: |
           mkdir -p dist
-          rsync -a --exclude '.git' --exclude '.github' ./ dist/
+          rsync -a --exclude '.git' --exclude '.github' --exclude 'nalle-blaster-betalning' ./ dist/
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
