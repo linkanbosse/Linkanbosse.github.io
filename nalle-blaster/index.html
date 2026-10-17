@@ -319,31 +319,31 @@ const SKINS={
 };
 const RARITY=[{name:'Vanlig',col:'#9aa3ad'},{name:'Sällsynt',col:'#3aa3dc'},{name:'Episk',col:'#a26cff'},{name:'Legendarisk',col:'#ffb020'}];
 const COMP={
-  lille:{name:'Lillebror',rar:0,skin:'brun',gun:'blaster',kind:'shoot',mult:.5,desc:'Skjuter tillsammans med dig.'},
-  pip:{name:'Pip',rar:0,skin:'pip',gun:'bubbla',kind:'shoot',mult:.6,desc:'Skjuter bubblor i högt tempo.'},
+  lille:{name:'Lillebror',rar:0,skin:'brun',gun:'blaster',kind:'shoot',mult:.35,desc:'Skjuter tillsammans med dig.'},
+  pip:{name:'Pip',rar:0,skin:'pip',gun:'bubbla',kind:'shoot',mult:.4,desc:'Skjuter bubblor i högt tempo.'},
   bambu:{name:'Bambu',rar:1,skin:'panda',gun:'morot',kind:'spear',cd:3,mult:3,desc:'Kastar bambuspjut som går igenom alla träd i en rad.'},
   frost:{name:'Frost',rar:1,skin:'is',gun:'is',kind:'ice',cd:5,mult:2,desc:'Isexplosion som fryser träden. Frusna träd tar dubbel skada.'},
-  hunny:{name:'Hunny',rar:1,skin:'honung',gun:'honung',kind:'honey',cd:6,mult:0,desc:'Ger +25% pengar och tappar honungsburkar med pengar.'},
+  hunny:{name:'Hunny',rar:1,skin:'honung',gun:'honung',kind:'honey',cd:6,mult:0,desc:'Ger +15% pengar och tappar honungsburkar med pengar.'},
   bruno:{name:'Bruno',rar:2,skin:'grizzly',kind:'slam',cd:2.6,mult:4,acc:'krigare',desc:'Rusar fram och dunkar marken. Träffar alla träd runt sig.'},
   kosmo:{name:'Kosmo',rar:2,skin:'kosmo',gun:'galax',kind:'laser',mult:1.4,acc:'helmet',desc:'Rymdlaser som bränner träden hela tiden.'},
   mystik:{name:'Mystik',rar:3,skin:'mystik',gun:'stjarna',kind:'meteor',cd:8,mult:15,acc:'trollkarl',desc:'Kallar ner en meteor som slår ut en hel dunge.'},
   guld:{name:'Guldnalle',rar:3,skin:'guld',gun:'guld',kind:'shoot',mult:.9,acc:'crown',desc:'Skjuter guldkulor. Fällda träd kan ge diamanter.'}
 };
 const JARS=[
-  {key:'liten',name:'Liten burk',cost:30,odds:[62,30,7,1],col:'#f2b630'},
-  {key:'stor',name:'Stor burk',cost:90,odds:[30,45,20,5],col:'#e98a2a'},
-  {key:'guld',name:'Guldburk',cost:250,odds:[0,40,45,15],col:'#ffd84d'}
+  {key:'liten',name:'Liten burk',cost:45,odds:[62,30,7,1],col:'#f2b630'},
+  {key:'stor',name:'Stor burk',cost:135,odds:[30,45,20,5],col:'#e98a2a'},
+  {key:'guld',name:'Guldburk',cost:375,odds:[0,40,45,15],col:'#ffd84d'}
 ];
 const FISH=[
   {key:'mort',name:'Mört',rar:0,w:40,money:20,gems:0,speed:.55,col:'#c0c8cf',fin:'#e0606a'},
   {key:'abborre',name:'Abborre',rar:0,w:30,money:35,gems:0,speed:.75,col:'#9cba5a',fin:'#ff8a3a',stripes:true},
-  {key:'gadda',name:'Gädda',rar:1,w:15,money:80,gems:3,speed:1.05,col:'#6f8f4a',fin:'#c9b34a',long:true},
-  {key:'lax',name:'Lax',rar:1,w:9,money:120,gems:5,speed:1.25,col:'#e8b0a0',fin:'#b87a6a'},
-  {key:'guldfisk',name:'Guldfisk',rar:2,w:5,money:200,gems:12,speed:1.5,col:'#ffb020',fin:'#ff7a20'},
-  {key:'regnbage',name:'Regnbågsfisk',rar:3,w:1,money:500,gems:40,speed:1.9,col:'rainbow',fin:'#ffffff'}
+  {key:'gadda',name:'Gädda',rar:1,w:15,money:80,gems:2,speed:1.05,col:'#6f8f4a',fin:'#c9b34a',long:true},
+  {key:'lax',name:'Lax',rar:1,w:9,money:120,gems:3,speed:1.25,col:'#e8b0a0',fin:'#b87a6a'},
+  {key:'guldfisk',name:'Guldfisk',rar:2,w:5,money:200,gems:6,speed:1.5,col:'#ffb020',fin:'#ff7a20'},
+  {key:'regnbage',name:'Regnbågsfisk',rar:3,w:1,money:500,gems:20,speed:1.9,col:'rainbow',fin:'#ffffff'}
 ];
-const MAX_WORMS=8,WORM_MS=300000;
-const MAX_TICKETS=5,TICKET_MS=600000,WHEEL_FREE_MS=4*3600000;
+const MAX_WORMS=8,WORM_MS=600000;
+const MAX_TICKETS=3,TICKET_MS=1200000,WHEEL_FREE_MS=8*3600000;
 const GUNS={
   blaster:{mz:25,name:'Popblaster',cost:0,mult:1,tier:0,shape:'blaster',color:'#e4553e',dark:'#9b2f22',shot:'bolt',shotCol:'#ffb24a',desc:'Den första blastern. Pang pang!'},
   vatten:{mz:26,name:'Vattenpistolen',cost:30,mult:1.4,tier:0,shape:'water',color:'#5cc4f2',dark:'#2a7fb0',shot:'drop',shotCol:'#8fdcff',desc:'Sprutar blöta vattendroppar.'},
@@ -385,10 +385,11 @@ const REG=[
   {name:'Vulkanskogen',icon:'🔥',wname:'Hetta',weather:'hetta',cx:D,cy:0,R:600,need:5,hp:256,money:400,trees:[9,10,9],grass:'#a08e72',edge:'#857358',tuft:'#6b5c47',deco:'#4a2418',effect:'Träden fattar eld och brinner'}
 ];
 REG.forEach((r,i)=>{r.p1=i*1.7+.4;r.p2=i*2.3+1.1;r.i=i});
+// Svårighet: priserna växer snabbare än inkomsten, så ekonomin kan inte skena iväg (det gjorde den förut).
 const UP={
-  power:{name:'Kraft',base:8,g:1.21},
-  speed:{name:'Hastighet',base:10,g:1.24},
-  money:{name:'Pengar',base:9,g:1.22}
+  power:{name:'Kraft',base:30,g:1.29},
+  speed:{name:'Hastighet',base:35,g:1.32},
+  money:{name:'Pengar',base:32,g:1.31}
 };
 const MISSIONS=[
   {key:'trees',txt:n=>`Fäll ${n} träd`,base:40,mult:2.2},
@@ -401,7 +402,7 @@ const MISSIONS=[
   {key:'golden',txt:n=>`Fäll ${n} guldträd`,base:1,mult:2}
 ];
 const EVO_NAMES=['Björnunge','Tonårsbjörn','Vuxen björn','Legendarisk björn'];
-const EVO_NEED=[40,250,1200];
+const EVO_NEED=[80,600,3000];
 const EVO_SCALE=[1,1.15,1.3,1.45];
 const PATHS={
   krigare:{name:'Krigarbjörn',icon:'⚔️',bg:'#ffb4a8',desc:n=>`+75% skada. Efter valet: ×${(1+.75*(n+1)).toFixed(2)} skada.`},
@@ -415,7 +416,7 @@ const fresh=()=>({money:0,gems:0,lv:{power:1,speed:1,money:1},world:1,sub:1,rebi
   boosts:{money:0,dmg:0},giftAt:0,mps:0,lastSeen:Date.now(),
   evo:{stage:0,xp:0,picks:[]},seen:[0],
   team:['lille',null,null],bears:{lille:{stars:1,dup:0}},music:true,worms:MAX_WORMS,wormAt:Date.now(),fish:{},maxWorld:1,
-  tickets:3,ticketAt:Date.now(),wheelFreeAt:0,daily:{day:0,last:''},best:{balloons:0},
+  tickets:2,ticketAt:Date.now(),wheelFreeAt:0,daily:{day:0,last:''},best:{balloons:0},
   mis:{trees:{tier:0,prog:0},wins:{tier:0,prog:0},ups:{tier:0,prog:0},chests:{tier:0,prog:0},events:{tier:0,prog:0},fish:{tier:0,prog:0},bonus:{tier:0,prog:0},golden:{tier:0,prog:0}},stats:{trees:0,chests:0,events:0,fish:0,jars:0,bonus:0,golden:0,gifts:0}});
 let S=fresh();
 const KEY='nalle-blaster-v1';
@@ -427,22 +428,22 @@ function load(){try{const r=localStorage.getItem(KEY);if(r){merge(JSON.parse(r))
 
 /* ================= formulas ================= */
 const stageIdx=()=>(S.world-1)*5+(S.sub-1);
-const rebirthMult=()=>Math.pow(2,S.rebirths);
+const rebirthMult=()=>Math.pow(1.5,S.rebirths);
 const boostOn=k=>S.boosts[k]>Date.now();
 const pathN=k=>S.evo.picks.filter(p=>p===k).length;
-const treeHP=()=>25*Math.pow(1.55,stageIdx());
-const baseDmg=()=>5*Math.pow(1.18,S.lv.power-1)*GUNS[S.gun].mult*rebirthMult()*(1+.75*pathN('krigare'))*(1+.12*S.evo.stage);
-const dmg=()=>baseDmg()*(boostOn('dmg')?2:1)*(rage>0?1.5:1);
+const treeHP=()=>60*Math.pow(1.75,stageIdx());
+const baseDmg=()=>5*Math.pow(1.16,S.lv.power-1)*GUNS[S.gun].mult*rebirthMult()*(1+.75*pathN('krigare'))*(1+.12*S.evo.stage);
+const dmg=()=>baseDmg()*(boostOn('dmg')?2:1)*(rage>0?1.3:1);
 const fireRate=()=>{const s=S.lv.speed-1;return 1.6+9*(1-Math.exp(-s/45))+0.02*s};
-const baseMoney=()=>Math.pow(1.17,S.lv.money-1)*Math.pow(1.35,stageIdx())*rebirthMult()*(1+.6*pathN('skatt'));
-const comboMult=()=>1+Math.min(2,combo*.05);
+const baseMoney=()=>.35*Math.pow(1.15,S.lv.money-1)*Math.pow(1.27,stageIdx())*rebirthMult()*(1+.6*pathN('skatt'));
+const comboMult=()=>1+Math.min(1,combo*.025);
 const starMul=k=>1+.4*(((S.bears[k]&&S.bears[k].stars)||1)-1);
-const hunnyMult=()=>helpers.some(x=>x.key==='hunny')?1+.25*starMul('hunny'):1;
-const moneyHit=()=>baseMoney()*(boostOn('money')?2:1)*(ev&&ev.type==='gold'?10:1)*comboMult()*hunnyMult();
+const hunnyMult=()=>helpers.some(x=>x.key==='hunny')?1+.15*starMul('hunny'):1;
+const moneyHit=()=>baseMoney()*(boostOn('money')?2:1)*(ev&&ev.type==='gold'?5:1)*comboMult()*hunnyMult();
 const slotCount=()=>1+(S.maxWorld>=2?1:0)+(S.maxWorld>=3?1:0);
 const cost=k=>UP[k].base*Math.pow(UP[k].g,S.lv[k]-1);
 const isBoss=()=>S.sub===5;
-const reward=()=>Math.round((8+3*stageIdx())*(isBoss()?3:1));
+const reward=()=>Math.round((5+2*stageIdx())*(isBoss()?2.5:1));
 const biome=()=>REG[(S.world-1)%REG.length];
 const unlocked=r=>S.world>=r.need;
 
@@ -518,7 +519,8 @@ let mode='idle'; // idle | challenge | won | lost
 let trees=[],bullets=[],parts=[],texts=[],stumps=[],uiBills=[],confetti=[],chests=[],bolts=[],wfx=[];
 let worldTufts=[],worldDeco=[],arenaTufts=[];
 let arena={base:430,p1:0,p2:0};
-let chal={time:60,total:0};
+const CHAL_TIME=45;
+let chal={time:CHAL_TIME,max:CHAL_TIME,total:0};
 let idleStash=null;
 let T=0;
 const cam={x:0,y:0};
@@ -531,8 +533,8 @@ function makeHelper(key,slot){const c=COMP[key];return{key,slot,x:bear.x+FORM[sl
 function buildHelpers(){const old=helpers;helpers=[];S.team.slice(0,slotCount()).forEach((k,i)=>{if(!k||!COMP[k]||!S.bears[k])return;const n=makeHelper(k,i);const o=old.find(x=>x.key===k);if(o){n.x=o.x;n.y=o.y}helpers.push(n)})}
 function placeHelpers(){helpers.forEach(hp=>{const f=FORM[hp.slot];hp.x=bear.x+f[0];hp.y=bear.y+f[1];hp.state='follow';hp.beam=null})}
 function resetFx(){spears=[];rings=[];meteors=[];pots=[];combo=0;comboT=0}
-let earnedWin=0,mpsTimer=0;
-let ev=null,evNext=rnd(35,55),lastEv='';
+let earnedWin=0,mpsTimer=0,mpsBoosted=false;
+let ev=null,evNext=rnd(50,80),lastEv='';
 let bees=0;
 let curRegion=0;
 const regionSpawn=REG.map(()=>0);
@@ -580,7 +582,7 @@ function spawnRegionTree(r,instant){
     const p=randomIn(r,40);
     if(Math.hypot(p.x-bear.x,p.y-bear.y)<110)continue;
     if(!spaceFree(p.x,p.y,38))continue;
-    const t=newTree(p.x,p.y,r.i,{});if(instant)t.grow=1;if(Math.random()<.025){t.golden=true;t.hp*=3;t.max*=3}trees.push(t);return;
+    const t=newTree(p.x,p.y,r.i,{});if(instant)t.grow=1;if(Math.random()<.01){t.golden=true;t.hp*=4;t.max*=4}trees.push(t);return;
   }
 }
 const regionCount=i=>{let n=0;for(const t of trees)if(t.reg===i&&!t.giant)n++;return n};
@@ -604,13 +606,13 @@ function setupChallenge(){
   mode='challenge';trees=[];chests=[];bullets=[];parts=[];texts=[];stumps=[];bolts=[];wfx=[];
   makeArena(430);
   bear.x=0;bear.y=0;buildHelpers();placeHelpers();resetFx();cam.x=0;cam.y=0;
-  chal.time=60;
+  chal.time=CHAL_TIME;chal.max=CHAL_TIME;
   const bi=biome().i;
   if(isBoss()){
-    const b=newTree(0,-190,bi,{boss:true,r:68,hpMul:18/REG[bi].hp,type:REG[bi].trees[0]});b.grow=1;b.mm=1;trees.push(b);
+    const b=newTree(0,-190,bi,{boss:true,r:68,hpMul:30/REG[bi].hp,type:REG[bi].trees[0]});b.grow=1;b.mm=1;trees.push(b);
     for(let i=0;i<6;i++){const a=-Math.PI/2+(i-2.5)*.5;const t=newTree(Math.cos(a)*300,Math.sin(a)*300+40,bi,{hpMul:1/REG[bi].hp});t.grow=1;t.mm=1;trees.push(t)}
   }else{
-    const nC=5,start=rnd(0,TAU);
+    const nC=6,start=rnd(0,TAU);
     for(let c=0;c<nC;c++){
       const a=start+c*TAU/nC+rnd(-.3,.3),r=rnd(170,300);
       const cx=Math.cos(a)*r,cy=Math.sin(a)*r;let made=0,tries=0;
@@ -686,11 +688,11 @@ function killTree(t){
   stumps.push({x:t.x,y:t.y,life:3,s:t.boss?2.6:t.giant?2.2:t.r/24});
   let bonus=moneyHit()*5*t.mm*(t.boss?25:1)*evMoney(t);
   let gems=0,xp=1;
-  if(t.hive){bonus*=16;gems=5;xp=10;bees=6;texts.push({x:t.x,y:t.y-80,txt:'Bina är arga! 🐝',col:'#ffe066',life:1.6,max:1.6,size:16})}
-  if(t.giant){bonus*=20;gems=10;xp=20}
+  if(t.hive){bonus*=12;gems=3;xp=10;bees=6;texts.push({x:t.x,y:t.y-80,txt:'Bina är arga! 🐝',col:'#ffe066',life:1.6,max:1.6,size:16})}
+  if(t.giant){bonus*=15;gems=6;xp=20}
   if(t.glow){gems=2;xp=3}
   if(t.golden||t.giant||t.hive||t.boss)bear.cheerT=1;
-  if(t.golden){bonus*=20;gems+=3;xp+=5;S.tickets++;S.stats.golden=(S.stats.golden||0)+1;missionAdd('golden',1);texts.push({x:t.x,y:t.y-90,txt:'GULDTRÄD! +1 🎟️',col:'#ffe066',life:1.8,max:1.8,size:20});addShake(5)}
+  if(t.golden){bonus*=12;gems+=2;xp+=5;S.tickets++;S.stats.golden=(S.stats.golden||0)+1;missionAdd('golden',1);texts.push({x:t.x,y:t.y-90,txt:'GULDTRÄD! +1 🎟️',col:'#ffe066',life:1.8,max:1.8,size:20});addShake(5)}
   if(t.boss)xp=15;
   addMoney(bonus);gainXP(xp);
   if(gems){S.gems+=gems;texts.push({x:t.x+30,y:t.y-30*sc,txt:'+'+gems+' 💎',col:'#8fe3ff',life:1.3,max:1.3,size:16})}
@@ -699,7 +701,7 @@ function killTree(t){
   for(let i=0;i<((t.boss||t.giant||t.hive)?10:3);i++)uiBills.push({x:sp.x+rnd(-12,12),y:sp.y+rnd(-12,12),vx:rnd(-160,160),vy:rnd(-220,-60),t:0,delay:rnd(0,.25),rot:rnd(0,TAU)});
   S.stats.trees++;missionAdd('trees',1);
   addShake(t.boss||t.giant?9:2.2);
-  if(rage<=0){combo++;comboT=2.6;if(combo>=25){startRage()}}else{comboT=2.6}
+  if(rage<=0){combo++;comboT=1.6;if(combo>=RAGE_AT){startRage()}}else{comboT=1.6}
   if(helpers.some(x=>x.key==='guld')&&Math.random()<.05*starMul('guld')){S.gems+=1;texts.push({x:t.x-20,y:t.y-36*sc,txt:'+1 💎',col:'#8fe3ff',life:1.2,max:1.2,size:14})}
   if(ev&&ev.tree===t)finishEvent(true);
   sfx.pop();setTimeout(sfx.coin,90);
@@ -717,8 +719,8 @@ function openChest(c){
   bear.cheerT=1;
   chests.splice(chests.indexOf(c),1);
   const ns=pathN('skatt');
-  const gems=Math.round((3+2*c.reg)*(1+ns));
-  const money=moneyHit()*30*REG[c.reg].money*(1+ns);
+  const gems=Math.round((2+c.reg)*(1+ns*.5));
+  const money=moneyHit()*15*REG[c.reg].money*(1+ns*.5);
   S.gems+=gems;addMoney(money);gainXP(5);S.stats.chests++;missionAdd('chests',1);
   texts.push({x:c.x,y:c.y-40,txt:'Skattkista!',col:'#ffe066',life:1.4,max:1.4,size:18});
   texts.push({x:c.x,y:c.y-20,txt:`+${gems} 💎  +${fmt(money)}`,col:'#a8ff6e',life:1.4,max:1.4,size:15});
@@ -729,7 +731,7 @@ function openChest(c){
 
 /* ================= events ================= */
 const EV_INFO={
-  gold:{title:'🌟 Guldregn!',sub:'Allt ger 10× pengar',time:25},
+  gold:{title:'🌟 Guldregn!',sub:'Allt ger 5× pengar',time:25},
   hive:{title:'🐝 En bikupa i skogen!',sub:'Fäll trädet med bikupan',time:45},
   giant:{title:'🌳 Jätteträdet har vaknat!',sub:'Fäll det innan det somnar om',time:50},
   night:{title:'🌙 Natten faller',sub:'Lysande träd ger diamanter',time:40}
@@ -743,11 +745,11 @@ function startEvent(){
     const cands=trees.filter(t=>t.reg===curRegion&&!t.dead&&t.grow>=1&&Math.hypot(t.x-bear.x,t.y-bear.y)>140);
     if(!cands.length){ev=null;evNext=10;return}
     cands.sort((a,b)=>Math.hypot(a.x-bear.x,a.y-bear.y)-Math.hypot(b.x-bear.x,b.y-bear.y));
-    const t=cands[Math.min(cands.length-1,Math.floor(rnd(0,5)))];t.hive=true;t.hp*=6;t.max*=6;ev.tree=t;
+    const t=cands[Math.min(cands.length-1,Math.floor(rnd(0,5)))];t.hive=true;t.hp*=10;t.max*=10;ev.tree=t;
   }else if(type==='giant'){
     let p=null;for(let k=0;k<30;k++){const a=rnd(0,TAU),x=bear.x+Math.cos(a)*260,y=bear.y+Math.sin(a)*260;if(walkable(x,y,60)&&spaceFree(x,y,30)){p={x,y};break}}
     if(!p){ev=null;evNext=10;return}
-    const t=newTree(p.x,p.y,curRegion,{giant:true,hpMul:40,type:R.trees[0]});t.grow=0;t.wx=p.x;t.wy=p.y;t.walk=0;trees.push(t);ev.tree=t;
+    const t=newTree(p.x,p.y,curRegion,{giant:true,hpMul:70,type:R.trees[0]});t.grow=0;t.wx=p.x;t.wy=p.y;t.walk=0;trees.push(t);ev.tree=t;
   }else if(type==='night'){
     const cands=trees.filter(t=>t.reg===curRegion&&!t.dead);
     for(let i=0;i<Math.min(8,cands.length);i++){const t=cands.splice(Math.floor(rnd(0,cands.length)),1)[0];t.glow=true}
@@ -757,16 +759,16 @@ function startEvent(){
 }
 function finishEvent(won){
   if(!ev)return;
-  if(won){S.stats.events++;missionAdd('events',1);toast(ev.type==='giant'?'Jätteträdet är fällt! +10 💎':ev.type==='hive'?'Bikupan är din! +5 💎 och massor av honung':'Händelsen klarad!')}
+  if(won){S.stats.events++;missionAdd('events',1);toast(ev.type==='giant'?'Jätteträdet är fällt! +6 💎':ev.type==='hive'?'Bikupan är din! +3 💎 och massor av honung':'Händelsen klarad!')}
   endEvent(false);
 }
 function endEvent(silent){
   if(!ev)return;
   if(ev.type==='night')for(const t of trees)t.glow=false;
-  if(ev.type==='hive'&&ev.tree&&!ev.tree.dead){ev.tree.hive=false;ev.tree.hp=Math.min(ev.tree.hp,ev.tree.max/6);ev.tree.max/=6;if(!silent)toast('Bina flög iväg med sin bikupa')}
+  if(ev.type==='hive'&&ev.tree&&!ev.tree.dead){ev.tree.hive=false;ev.tree.hp=Math.min(ev.tree.hp,ev.tree.max/10);ev.tree.max/=10;if(!silent)toast('Bina flög iväg med sin bikupa')}
   if(ev.type==='giant'&&ev.tree&&!ev.tree.dead){const t=ev.tree;t.dead=true;if(!silent){toast('Jätteträdet somnade om och gick hem');for(let i=0;i<16;i++)parts.push({x:t.x,y:t.y-40,vx:rnd(-80,80),vy:rnd(-120,0),life:.8,max:.8,col:'#ffffff',size:rnd(4,8),type:'blob'})}}
   if(ev.type==='gold'||ev.type==='night'){if(!silent){S.stats.events++;missionAdd('events',1)}}
-  ev=null;evNext=rnd(40,75);$('eventBanner').hidden=true;
+  ev=null;evNext=rnd(60,110);$('eventBanner').hidden=true;
 }
 function updateEvents(dt){
   if(mode!=='idle')return;
@@ -828,11 +830,12 @@ function updateBear(b,dt,mv){
   if(t){b.aim=angLerp(b.aim,Math.atan2(t.y-22*treeTop(t)-b.y,t.x-b.x),Math.min(1,dt*18))}
   else if(b.moving){b.aim=angLerp(b.aim,Math.atan2(vy,vx),Math.min(1,dt*8))}
   b.cool-=dt;b.flash-=dt;if(b.cheerT>0)b.cheerT-=dt;
-  if(t&&b.cool<=0){fire(b,t);b.cool+=1/(fireRate()*(b.main?(rage>0?2:1):.8));if(b.cool<0)b.cool=0}
+  if(t&&b.cool<=0){fire(b,t);b.cool+=1/(fireRate()*(b.main?(rage>0?1.6:1):.8));if(b.cool<0)b.cool=0}
   if(!t&&b.cool<0)b.cool=0;
 }
 function addShake(a){if(!reduced)shake=Math.min(14,shake+a)}
-function startRage(){rage=8;combo=0;comboT=0;sfx.rage();addShake(6);
+const RAGE_AT=40;
+function startRage(){rage=6;combo=0;comboT=0;sfx.rage();addShake(6);
   for(let i=0;i<30;i++){const a=i/30*TAU;parts.push({x:bear.x,y:bear.y-10,vx:Math.cos(a)*240,vy:Math.sin(a)*240,life:.6,max:.6,col:pick(['#ff6a3c','#ffcf45','#ff3c3c']),size:rnd(4,7),type:'blob'})}
   texts.push({x:bear.x,y:bear.y-70,txt:'RASERI!',col:'#ff7a4a',life:1.6,max:1.6,size:26})}
 function aoe(x,y,r,d,col,label){
@@ -877,7 +880,7 @@ function updateHelper(hp,dt){
         for(let i=0;i<14;i++)parts.push({x:t.x+rnd(-30,30),y:t.y-20+rnd(-20,20),vx:rnd(-90,90),vy:rnd(-110,30),life:.6,max:.6,col:pick(['#e6f7ff','#bfefff','#ffffff']),size:rnd(2,4),type:'leaf',rot:rnd(0,TAU)});
         hp.cd=c.cd;hp.flash=.1;if(n)beep(1200,.15,'sine',.03,600)}break;
     case 'honey':
-      if(hp.cd<=0){pots.push({x:hp.x+rnd(-10,10),y:hp.y+4,t:0,val:baseMoney()*25*sm*(boostOn('money')?2:1)});hp.cd=c.cd}break;
+      if(hp.cd<=0){pots.push({x:hp.x+rnd(-10,10),y:hp.y+4,t:0,val:baseMoney()*12*sm*(boostOn('money')?2:1)});hp.cd=c.cd}break;
     case 'slam':
       if(hp.cd<=0&&hp.state==='follow'){const tt=nearestTree(hp,280);if(tt){hp.state='dash';hp.tgt=tt}}break;
     case 'laser':
@@ -942,7 +945,7 @@ function update(dt){
     // spawning per region
     for(const r of REG){if(!unlocked(r))continue;regionSpawn[r.i]-=dt*(r.weather==='regn'?2:1);
       if(regionSpawn[r.i]<=0){regionSpawn[r.i]=.8;if(regionCount(r.i)<PER_REGION)spawnRegionTree(r,false)}}
-    chestT-=dt;if(chestT<=0){chestT=30/(1+pathN('skatt'));spawnChest()}
+    chestT-=dt;if(chestT<=0){chestT=60/(1+.5*pathN('skatt'));spawnChest()}
     for(const c of chests){if(Math.hypot(c.x-bear.x,c.y-bear.y)<28){openChest(c);break}}
     updateEvents(dt);
     updateGift(dt);
@@ -961,17 +964,18 @@ function update(dt){
   for(let i=confetti.length-1;i>=0;i--){const c=confetti[i];c.x+=c.vx*dt;c.y+=c.vy*dt;c.vy+=260*dt;c.vx*=.99;c.rot+=c.vr*dt;c.life-=dt;if(c.life<=0||c.y>H+20)confetti.splice(i,1)}
   const k=Math.min(1,dt*5);cam.x+=(bear.x-cam.x)*k;cam.y+=(bear.y-cam.y)*k;
   if(S.auto){autoT-=dt;if(autoT<=0){autoT=.35;let best=null;for(const kk in UP){if(S.money>=cost(kk)&&(!best||cost(kk)<cost(best)))best=kk}if(best)buy(best,true)}}
-  mpsTimer+=dt;if(mpsTimer>=5){if(mode==='idle'&&(!ev||ev.type!=='gold')){const s=earnedWin/mpsTimer;S.mps=S.mps?S.mps*.7+s*.3:s}earnedWin=0;mpsTimer=0}
+  if(rage>0||boostOn('money')||(ev&&ev.type==='gold')||combo>10)mpsBoosted=true;
+  mpsTimer+=dt;if(mpsTimer>=5){if(mode==='idle'&&!mpsBoosted){const s=earnedWin/mpsTimer;S.mps=S.mps?S.mps*.7+s*.3:s}earnedWin=0;mpsTimer=0;mpsBoosted=false}
   if(pillBump>0)pillBump-=dt;
   uiT-=dt;if(uiT<=0){uiT=.1;updateUI()}
   mapT-=dt;if(mapT<=0){mapT=.2;drawMiniMap()}
   saveT-=dt;if(saveT<=0){saveT=4;save()}
 }
-let gift=null,giftT=rnd(20,35);
+let gift=null,giftT=rnd(60,90);
 function updateGift(dt){
   if(!gift){giftT-=dt;if(giftT<=0&&!modalOpen){gift={x:-40,y:rnd(H*.28,H*.5),vx:rnd(45,65),t:0,ph:rnd(0,TAU)}}return}
   gift.t+=dt;gift.x+=gift.vx*dt;gift.y+=Math.sin(gift.t*1.6+gift.ph)*14*dt;
-  if(gift.x>W+50){gift=null;giftT=rnd(40,80)}
+  if(gift.x>W+50){gift=null;giftT=rnd(90,150)}
 }
 function drawGift(){
   if(!gift||mode!=='idle')return;
@@ -987,17 +991,17 @@ function drawGift(){
   ctx.restore();
 }
 function claimGift(){
-  const x=gift.x,y=gift.y;gift=null;giftT=rnd(40,80);S.stats.gifts=(S.stats.gifts||0)+1;
+  const x=gift.x,y=gift.y;gift=null;giftT=rnd(90,150);S.stats.gifts=(S.stats.gifts||0)+1;
   const r=Math.random();let msg;
-  if(r<.4){const n=Math.round(rnd(5,16));S.gems+=n;msg=`+${n} 💎`}
-  else if(r<.7){const m=Math.max(baseMoney()*150,(S.mps||0)*90);addMoney(m);msg=`+${fmt(m)} pengar`;for(let i=0;i<8;i++)uiBills.push({x,y,vx:rnd(-160,160),vy:rnd(-220,-60),t:0,delay:rnd(0,.2),rot:rnd(0,TAU)})}
+  if(r<.4){const n=Math.round(rnd(3,8));S.gems+=n;msg=`+${n} 💎`}
+  else if(r<.7){const m=Math.max(baseMoney()*80,(S.mps||0)*45);addMoney(m);msg=`+${fmt(m)} pengar`;for(let i=0;i<8;i++)uiBills.push({x,y,vx:rnd(-160,160),vy:rnd(-220,-60),t:0,delay:rnd(0,.2),rot:rnd(0,TAU)})}
   else if(r<.9){S.tickets+=1;msg='+1 🎟️ biljett'}
-  else{S.tickets+=2;S.gems+=10;msg='+2 🎟️ och +10 💎'}
+  else{S.tickets+=1;S.gems+=5;msg='+1 🎟️ och +5 💎'}
   for(let i=0;i<30;i++)confetti.push({x,y,vx:rnd(-260,260),vy:rnd(-320,40),rot:rnd(0,TAU),vr:rnd(-10,10),w:rnd(5,10),col:pick(['#ff5a8a','#ffcf45','#5ce0ff','#7be06b']),life:2});
   sfx.chest();toast('🎈 Presentballong! '+msg);save();
 }
 function refillTickets(){if(S.tickets>=MAX_TICKETS){S.ticketAt=Date.now();return}const n=Math.floor((Date.now()-S.ticketAt)/TICKET_MS);if(n>0){S.tickets=Math.min(MAX_TICKETS,S.tickets+n);S.ticketAt+=n*TICKET_MS;if(S.tickets>=MAX_TICKETS)S.ticketAt=Date.now()}}
-function useTicket(){refillTickets();if(S.tickets<=0){toast('Slut på biljetter. En ny kommer var tionde minut, och guldträd ger biljetter!');return false}if(S.tickets===MAX_TICKETS)S.ticketAt=Date.now();S.tickets--;S.stats.bonus=(S.stats.bonus||0)+1;missionAdd('bonus',1);save();return true}
+function useTicket(){refillTickets();if(S.tickets<=0){toast('Slut på biljetter. En ny kommer var tjugonde minut, och guldträd ger biljetter!');return false}if(S.tickets===MAX_TICKETS)S.ticketAt=Date.now();S.tickets--;S.stats.bonus=(S.stats.bonus||0)+1;missionAdd('bonus',1);save();return true}
 function updateWeather(dt){
   const w=mode==='idle'?REG[curRegion].weather:'none';
   if(!reduced){
@@ -1556,15 +1560,15 @@ function updateUI(){
   const inChal=mode!=='idle';
   $('centerBox').hidden=inChal;$('timerBox').hidden=!inChal;$('exitBtn').hidden=mode!=='challenge';
   $('leftCol').style.display=inChal?'none':'';$('rightCol').style.display=inChal?'none':'';$('leftTop').style.display=inChal?'none':'';
-  if(inChal){const s=Math.ceil(chal.time);setTxt('timerTxt',s+'s');$('timerFill').style.width=(chal.time/60*100)+'%';
-    $('timerFill').style.background=chal.time<10?'linear-gradient(#ffb0a0,#e5484d)':'';
+  if(inChal){const s=Math.ceil(chal.time);setTxt('timerTxt',s+'s');$('timerFill').style.width=(chal.time/chal.max*100)+'%';
+    $('timerFill').style.background=chal.time<8?'linear-gradient(#ffb0a0,#e5484d)':'';
     setTxt('treesLeft',(isBoss()?'👑 ':'🌳 ')+trees.length+' kvar')}
   $('bossLock').style.display=isBoss()?'none':'';
   $('btnBoss').style.opacity=isBoss()?'1':'.75';
   $('autoTxt').textContent=S.auto?'Auto på':'Auto av';$('btnAuto').className='tool '+(S.auto?'green':'grey');
   $('dotShop').classList.toggle('show',Date.now()>=S.giftAt);
   $('dotMission').classList.toggle('show',MISSIONS.some(m=>missionDone(m)));
-  $('dotRebirth').classList.toggle('show',S.world>=3);
+  $('dotRebirth').classList.toggle('show',S.world>=4);
   // evolution
   const st=S.evo.stage;
   setTxt('evoName',(st===3?'🌟 ':'🧸 ')+EVO_NAMES[st]);
@@ -1576,8 +1580,8 @@ function updateUI(){
   if(cache.boost!==bh){cache.boost=bh;$('boostRow').innerHTML=bh}
   // combo
   const cb=$('combo');
-  if(rage>0){cb.hidden=false;cb.classList.add('rage');setTxt('comboN','🔥 '+Math.ceil(rage)+'s');setTxt('comboL','RASERI! ×2 fart');$('comboFill').style.width=(rage/8*100)+'%'}
-  else if(combo>=3){cb.hidden=false;cb.classList.remove('rage');setTxt('comboN','x'+combo);setTxt('comboL',`KOMBO · ×${comboMult().toFixed(2)} pengar`);$('comboFill').style.width=(combo/25*100)+'%'}
+  if(rage>0){cb.hidden=false;cb.classList.add('rage');setTxt('comboN','🔥 '+Math.ceil(rage)+'s');setTxt('comboL','RASERI! ×1.6 fart');$('comboFill').style.width=(rage/6*100)+'%'}
+  else if(combo>=3){cb.hidden=false;cb.classList.remove('rage');setTxt('comboN','x'+combo);setTxt('comboL',`KOMBO · ×${comboMult().toFixed(2)} pengar`);$('comboFill').style.width=(combo/RAGE_AT*100)+'%'}
   else cb.hidden=true;
   $('rageVignette').classList.toggle('on',rage>0);
   refillWorms();refillTickets();
@@ -1606,8 +1610,8 @@ function buy(k,silent){
 let toastT=null;
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800)}
 
-const misTarget=m=>Math.round(m.base*Math.pow(m.mult,S.mis[m.key].tier));
-const misReward=m=>12+8*S.mis[m.key].tier;
+const misTarget=m=>Math.round(m.base*1.5*Math.pow(m.mult,S.mis[m.key].tier));
+const misReward=m=>8+5*S.mis[m.key].tier;
 const missionDone=m=>S.mis[m.key].prog>=misTarget(m);
 function missionAdd(k,n){if(S.mis[k])S.mis[k].prog+=n}
 
@@ -1642,7 +1646,7 @@ function transition(fn,txt){
 function showChallengeIntro(){
   const boss=isBoss(),bi=biome();
   openModal({title:boss?'Bossnivå':'Nivå '+S.world+'-'+S.sub,avatar:treeIcon(boss,110,bi.trees[0]),body:[
-    h('div',{class:'panel'},h('div',{class:'big',style:'font-size:18px'},boss?'Fäll Jätteeken och hans vänner inom 1 minut!':'Fäll alla träd inom 1 minut!'),
+    h('div',{class:'panel'},h('div',{class:'big',style:'font-size:18px'},boss?'Fäll Jätteeken och hans vänner inom 45 sekunder!':'Fäll alla träd inom 45 sekunder!'),
       h('div',{class:'note'},(boss?'Bossen har mycket liv. Uppgradera Kraft innan du börjar. ':'Dra med fingret för att styra björnen. Den skjuter automatiskt. ')+`Banan: ${bi.icon} ${bi.name}.`)),
     h('div',{class:'panel'},h('div',{class:'k'},'Belöning'),h('div',{class:'big',html:gemHTML(reward())})),
     h('div',{class:'btns'},h('button',{class:'btn',on:{click:()=>{closeModal();transition(setupChallenge)}}},'Utmana'))
@@ -1722,14 +1726,14 @@ function showShop(){
   const now=Date.now(),gift=now>=S.giftAt;
   const giftLeft=Math.max(0,S.giftAt-now);
   const icon=(e)=>miniCanvas(58,(x,s)=>{x.font='34px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText(e,s/2,s/2+2)});
-  const sack=Math.max(100,(S.mps||1)*180);
+  const sack=Math.max(60,(S.mps||1)*120);
   const buyBoost=(k,c)=>()=>{if(S.gems<c)return toast('Du behöver fler diamanter');S.gems-=c;S.boosts[k]=Math.max(Date.now(),S.boosts[k])+180000;sfx.buy();save();showShop()};
   openModal({title:'Butik',body:[
-    itemRow(icon('🎁'),'Gratis gåva',gift?'Hämta 20 diamanter':`Ny gåva om ${Math.floor(giftLeft/3600000)} h ${Math.floor(giftLeft/60000)%60} min`,
-      h('button',{class:'btn sm green',...(gift?{}:{disabled:''}),on:{click:()=>{S.gems+=20;S.giftAt=Date.now()+4*3600000;sfx.coin();save();showShop()}}},'Hämta')),
-    itemRow(icon('🍯'),'Dubbla pengar','Alla pengar ×2 i 3 minuter',h('button',{class:'btn sm',html:gemHTML(25),on:{click:buyBoost('money',25)}})),
-    itemRow(icon('💥'),'Dubbel skada','All skada ×2 i 3 minuter',h('button',{class:'btn sm',html:gemHTML(25),on:{click:buyBoost('dmg',25)}})),
-    itemRow(icon('💰'),'Pengasäck',`Få ${fmt(sack)} direkt`,h('button',{class:'btn sm',html:gemHTML(15),on:{click:()=>{if(S.gems<15)return toast('Du behöver fler diamanter');S.gems-=15;addMoney(sack);sfx.coin();save();showShop()}}})),
+    itemRow(icon('🎁'),'Gratis gåva',gift?'Hämta 10 diamanter':`Ny gåva om ${Math.floor(giftLeft/3600000)} h ${Math.floor(giftLeft/60000)%60} min`,
+      h('button',{class:'btn sm green',...(gift?{}:{disabled:''}),on:{click:()=>{S.gems+=10;S.giftAt=Date.now()+6*3600000;sfx.coin();save();showShop()}}},'Hämta')),
+    itemRow(icon('🍯'),'Dubbla pengar','Alla pengar ×2 i 3 minuter',h('button',{class:'btn sm',html:gemHTML(40),on:{click:buyBoost('money',40)}})),
+    itemRow(icon('💥'),'Dubbel skada','All skada ×2 i 3 minuter',h('button',{class:'btn sm',html:gemHTML(40),on:{click:buyBoost('dmg',40)}})),
+    itemRow(icon('💰'),'Pengasäck',`Få ${fmt(sack)} direkt`,h('button',{class:'btn sm',html:gemHTML(25),on:{click:()=>{if(S.gems<25)return toast('Du behöver fler diamanter');S.gems-=25;addMoney(sack);sfx.coin();save();showShop()}}})),
     itemRow(icon('🪱'),'Burk med maskar',`Fyll på maskar till fisket (${S.worms}/${MAX_WORMS})`,h('button',{class:'btn sm',html:gemHTML(5),...(S.worms>=MAX_WORMS?{disabled:''}:{}),on:{click:()=>{if(S.gems<5)return toast('Du behöver fler diamanter');S.gems-=5;S.worms=MAX_WORMS;S.wormAt=Date.now();sfx.buy();save();showShop()}}})),
     itemRow(icon('🌟'),'Starta en händelse','Guldregn, bikupa, jätteträd eller natt direkt',h('button',{class:'btn sm',html:gemHTML(10),on:{click:()=>{if(ev)return toast('En händelse pågår redan');if(S.gems<10)return toast('Du behöver fler diamanter');S.gems-=10;closeModal();startEvent();if(!ev){S.gems+=10;toast('Försök igen om en stund')}}}}))
   ]});
@@ -1743,13 +1747,13 @@ function showMissions(){
   openModal({title:'Uppdrag',body:rows});
 }
 function showRebirth(){
-  const ok=S.world>=3;
+  const ok=S.world>=4;
   openModal({title:'Återföds',body:[
     h('div',{class:'panel'},h('div',{class:'k'},'Nu'),h('div',{class:'big'},`×${fmt(rebirthMult())} skada och pengar`),
-      h('div',{class:'k'},'Efter återfödelse'),h('div',{class:'big',style:'color:#4e8f2c'},`×${fmt(rebirthMult()*2)} + 30 💎`)),
-    h('div',{class:'note'},ok?'Pengar, uppgraderingar och nivå börjar om från 1-1, och regionerna låses igen. Diamanter, björnar, vapen och björnens utveckling behåller du.':'Nå värld 3 (nivå 3-1) för att kunna återfödas.'),
+      h('div',{class:'k'},'Efter återfödelse'),h('div',{class:'big',style:'color:#4e8f2c'},`×${fmt(rebirthMult()*1.5)} + 20 💎`)),
+    h('div',{class:'note'},ok?'Pengar, uppgraderingar och nivå börjar om från 1-1, och regionerna låses igen. Diamanter, björnar, vapen och björnens utveckling behåller du.':'Nå värld 4 (nivå 4-1) för att kunna återfödas.'),
     h('div',{class:'btns'},h('button',{class:'btn',...(ok?{}:{disabled:''}),on:{click:()=>{
-      endEvent(true);S.rebirths++;S.gems+=30;S.money=0;S.lv={power:1,speed:1,money:1};S.world=1;S.sub=1;S.mps=0;save();closeModal();idleStash=null;transition(setupIdle)}}},'Återföds'))
+      endEvent(true);S.rebirths++;S.gems+=20;S.money=0;S.lv={power:1,speed:1,money:1};S.world=1;S.sub=1;S.mps=0;save();closeModal();idleStash=null;transition(setupIdle)}}},'Återföds'))
   ]});
 }
 function showMap(){
@@ -1815,7 +1819,7 @@ function openJar(j,free){
   S.stats.jars=(S.stats.jars||0)+1;
   const k=rollBear(j),c=COMP[k];let result;
   if(!S.bears[k]){S.bears[k]={stars:1,dup:0};result='new';const free=S.team.findIndex((x,i)=>!x&&i<slotCount());if(free>=0){S.team[free]=k;buildHelpers();placeHelpers()}}
-  else{const b=S.bears[k];if(b.stars<5){b.dup++;if(b.dup>=b.stars){b.dup=0;b.stars++;result='star'}else result='dup'}else{const back=Math.round(j.cost*.3);S.gems+=back;result='max:'+back}}
+  else{const b=S.bears[k];if(b.stars<5){b.dup++;if(b.dup>=b.stars*2){b.dup=0;b.stars++;result='star'}else result='dup'}else{const back=Math.round(j.cost*.3);S.gems+=back;result='max:'+back}}
   save();
   const cvs=h('canvas',{class:'jarcv',width:520,height:520});
   const info=h('div',{class:'panel',style:'visibility:hidden'});
@@ -1841,7 +1845,7 @@ function openJar(j,free){
         info.appendChild(h('div',{class:'big'},c.name));
         const b2=S.bears[k];
         info.appendChild(h('div',{class:'stars'},starsTxt(b2.stars)));
-        info.appendChild(h('div',{class:'note'},result==='new'?'NY! '+c.desc:result==='star'?`Kopia! ${c.name} gick upp till ${b2.stars} stjärnor och blev starkare.`:result==='dup'?`Kopia! ${b2.dup}/${b2.stars} till nästa stjärna.`:`${c.name} har redan max stjärnor. Du fick tillbaka ${result.split(':')[1]} 💎.`));
+        info.appendChild(h('div',{class:'note'},result==='new'?'NY! '+c.desc:result==='star'?`Kopia! ${c.name} gick upp till ${b2.stars} stjärnor och blev starkare.`:result==='dup'?`Kopia! ${b2.dup}/${b2.stars*2} till nästa stjärna.`:`${c.name} har redan max stjärnor. Du fick tillbaka ${result.split(':')[1]} 💎.`));
         again.disabled=S.gems<j.cost}}
     requestAnimationFrame(frame)};
   frame();
@@ -1863,7 +1867,7 @@ function showTeam(){
     const b=own;
     return h('div',{class:'item r'+c.rar},compPreview(k,58),h('div',{class:'info'},
       h('div',{class:'nm'},c.name+' ',h('span',{class:'stars'},starsTxt(b.stars))),
-      h('div',{class:'ds rar'+c.rar,style:'font-weight:700'},RARITY[c.rar].name+(b.stars<5?` · ${b.dup}/${b.stars} kopior till nästa ★`:' · Max')),
+      h('div',{class:'ds rar'+c.rar,style:'font-weight:700'},RARITY[c.rar].name+(b.stars<5?` · ${b.dup}/${b.stars*2} kopior till nästa ★`:' · Max')),
       h('div',{class:'ds'},c.desc+(c.mult?` Styrka ×${(c.mult*starMul(k)).toFixed(1)}.`:` Bonus ×${starMul(k).toFixed(1)}.`))),btn)});
   openModal({title:'Björngänget',ribbon:'',body:[
     h('div',{class:'sect'},'Ditt lag'),slots,
@@ -2006,13 +2010,13 @@ const dayStr=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
 function dailyReady(){return S.daily.last!==dayStr(new Date())}
 function dailyNext(){const y=new Date();y.setDate(y.getDate()-1);return S.daily.last===dayStr(y)?(S.daily.day%7)+1:1}
 const DAILY=[
+  {icon:'💎',txt:'10 💎',give(){S.gems+=10}},
+  {icon:'🎟️',txt:'1 biljett',give(){S.tickets+=1}},
   {icon:'💎',txt:'20 💎',give(){S.gems+=20}},
-  {icon:'🎟️',txt:'2 biljetter',give(){S.tickets+=2}},
-  {icon:'💎',txt:'40 💎',give(){S.gems+=40}},
   {icon:'🍯',txt:'Liten burk',jar:0},
-  {icon:'🎁',txt:'60 💎 + 3 🎟️',give(){S.gems+=60;S.tickets+=3}},
+  {icon:'🎁',txt:'30 💎 + 2 🎟️',give(){S.gems+=30;S.tickets+=2}},
   {icon:'🍯',txt:'Stor burk',jar:1},
-  {icon:'👑',txt:'Guldburk + 100 💎',give(){S.gems+=100},jar:2}
+  {icon:'👑',txt:'Guldburk + 50 💎',give(){S.gems+=50},jar:2}
 ];
 function showDaily(){
   const next=dailyNext();
@@ -2115,11 +2119,11 @@ const WHEEL=[
   {label:'25 DIAMANTER',short:'25',icon:'gem',col:'#3b9ff0',w:22,give(){S.gems+=25;return{title:'25 diamanter',n:25,unit:'diamanter'}}},
   {label:'PENGAR',icon:'bills',col:'#47b83e',w:20,give(){const m=Math.max(baseMoney()*200,(S.mps||0)*240);addMoney(m);return{title:fmt(m)+' pengar',sub:'Rakt in i plånboken'}}},
   {label:'3 BILJETTER',short:'3 ST',icon:'ticket',col:'#ff8a34',w:14,give(){S.tickets+=3;return{title:'3 biljetter',n:3,unit:'biljetter',sub:'Till fler bonusspel'}}},
-  {label:'100 DIAMANTER',short:'100',icon:'gems',col:'#8a58df',w:8,give(){S.gems+=100;return{title:'100 diamanter',n:100,unit:'diamanter'}}},
+  {label:'100 DIAMANTER',short:'100',icon:'gems',col:'#8a58df',w:5,give(){S.gems+=100;return{title:'100 diamanter',n:100,unit:'diamanter'}}},
   {label:'HONUNGSBURK',short:'BURK',icon:'jar',col:'#eaa41c',w:10,jar:0,give(){return{title:'En honungsburk',sub:'Med en björnkompis i'}}},
   {label:'2× PENGAR',icon:'coin2',col:'#ec5590',w:12,give(){S.boosts.money=Math.max(Date.now(),S.boosts.money)+300000;return{title:'2× pengar',sub:'I 5 minuter'}}},
   {label:'MASKAR',icon:'worm',col:'#22a99a',w:10,give(){S.worms=MAX_WORMS;S.wormAt=Date.now();return{title:'Full maskburk',sub:'Dags att fiska!'}}},
-  {label:'JACKPOT',icon:'chest',col:'#e23d3d',w:4,jackpot:true,give(){S.gems+=500;S.tickets+=5;return{title:'JACKPOT!',n:500,unit:'diamanter',sub:'och 5 biljetter'}}}
+  {label:'JACKPOT',icon:'chest',col:'#e23d3d',w:1.5,jackpot:true,give(){S.gems+=500;S.tickets+=5;return{title:'JACKPOT!',n:500,unit:'diamanter',sub:'och 5 biljetter'}}}
 ];
 // Fältens storlek: hälften lika stort för alla, hälften efter chansen att vinna.
 // Ovanliga priser ser alltså mindre ut, så hjulet visar ungefär hur chansen är.
@@ -2201,9 +2205,9 @@ function buildWheelArt(px){
   const bulb=on=>sprite(24,24,px,x=>{if(on){const gl=x.createRadialGradient(12,12,0,12,12,11);gl.addColorStop(0,'rgba(255,240,170,.95)');gl.addColorStop(1,'rgba(255,200,80,0)');x.fillStyle=gl;circ(x,12,12,11);x.fill()}
     const bg=x.createRadialGradient(10.8,10.8,.3,12,12,4);bg.addColorStop(0,on?'#ffffff':'#fff2c0');bg.addColorStop(1,on?'#ffd23f':'#9a6a14');x.fillStyle=bg;circ(x,12,12,3.9);x.fill()});
   bulbOn=bulb(true);bulbOff=bulb(false);
-  pointerSpr=sprite(40,64,px,x=>drawPointer(x,20,16,0));
+  pointerSpr=sprite(40,64,px,x=>drawWheelPointer(x,20,16,0));
 }
-function drawPointer(c,x,y,ang){
+function drawWheelPointer(c,x,y,ang){
   c.save();c.translate(x,y);c.rotate(ang);
   c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.moveTo(-15,2+3);c.quadraticCurveTo(0,-8+3,15,2+3);c.lineTo(3,38+3);c.quadraticCurveTo(0,42+3,-3,38+3);c.closePath();c.fill();
   c.beginPath();c.moveTo(-16,0);c.quadraticCurveTo(0,-12,16,0);c.lineTo(3.5,37);c.quadraticCurveTo(0,42,-3.5,37);c.closePath();
@@ -2217,7 +2221,7 @@ function wheelThumb(size){
   const c=h('canvas',{width:size*2,height:size*2});
   loadPrizeArt().then(()=>{if(!wheelFace)buildWheelArt(2);const x=c.getContext('2d');x.scale(2*size/WR.size,2*size/WR.size);x.translate(0,(WR.size-WR.h)/2+4);
     x.save();x.translate(WR.cx,WR.cy);x.rotate(-.35);const fs=wheelFace.width/wheelPx;x.drawImage(wheelFace,-fs/2,-fs/2,fs,fs);x.restore();
-    x.drawImage(wheelOverlay,0,0,WR.size,WR.h);drawPointer(x,WR.cx,WR.cy-WR.rim-4,0)});
+    x.drawImage(wheelOverlay,0,0,WR.size,WR.h);drawWheelPointer(x,WR.cx,WR.cy-WR.rim-4,0)});
   return c;
 }
 function showWheel(){
@@ -2352,11 +2356,11 @@ function playBalloons(){
       else{G.score+=1;beep(rnd(600,900),.08,'triangle',.05,300)}
       break}}});
   let last=performance.now();
-  const end=()=>{G.over=true;const money=baseMoney()*G.score*14,gems=G.gold*2;const rec=G.score>(S.best.balloons||0);if(rec)S.best.balloons=G.score;
-    addMoney(money);S.gems+=gems+(rec?10:0);gainXP(3);save();sfx.win();if(rec)burstConfetti();
+  const end=()=>{G.over=true;const money=baseMoney()*G.score*8,gems=G.gold;const rec=G.score>(S.best.balloons||0);if(rec)S.best.balloons=G.score;
+    addMoney(money);S.gems+=gems+(rec?5:0);gainXP(3);save();sfx.win();if(rec)burstConfetti();
     openModal({title:rec?'Nytt rekord!':'Bra jobbat!',ribbon:'gold',close:false,body:[
       h('div',{class:'panel'},h('div',{class:'k'},'Poäng'),h('div',{class:'big'},String(G.score)),h('div',{class:'note'},`Bästa: ${S.best.balloons}`)),
-      h('div',{class:'panel'},h('div',{class:'k'},'Du fick'),h('div',{style:'font-weight:700'},`+${fmt(money)} pengar`),h('div',{style:'font-weight:700',html:gemHTML(gems+(rec?10:0))+(rec?' (10 extra för rekord!)':'')})),
+      h('div',{class:'panel'},h('div',{class:'k'},'Du fick'),h('div',{style:'font-weight:700'},`+${fmt(money)} pengar`),h('div',{style:'font-weight:700',html:gemHTML(gems+(rec?5:0))+(rec?' (5 extra för rekord!)':'')})),
       h('div',{class:'btns'},h('button',{class:'btn grey',on:{click:showBonus}},'Tillbaka'),h('button',{class:'btn green ol',on:{click:playBalloons}},'Igen (1 🎟️)'))]})};
   const loop=now=>{if(!cvs.isConnected)return;const dt=Math.min(.05,(now-last)/1000);last=now;
     if(!G.over){G.t-=dt;G.el+=dt;G.sp-=dt;
@@ -2408,9 +2412,9 @@ function playDig(){
   const finish=()=>{over=true;cells.forEach((c,i)=>{if(!c.dug){btns[i].textContent=icon(c,i);btns[i].classList.add('dim','done')}});back.style.display='';gainXP(3);save()};
   const btns=cells.map((c,i)=>h('button',{class:'dig','aria-label':'Gräv ruta '+(i+1),on:{click:()=>{
     if(over||c.dug)return;c.dug=true;spades--;btns[i].classList.add('done');btns[i].textContent=icon(c,i);
-    if(c.type==='chest'){const g=60,m=baseMoney()*500;S.gems+=g;addMoney(m);found.gems+=g;found.money+=m;found.chest=true;sfx.jar();burstConfetti();msg.textContent='DU HITTADE SKATTEN! +60 💎 och massor av pengar!';upd();finish();return}
-    if(c.type==='gems'){S.gems+=8;found.gems+=8;sfx.chest()}
-    else if(c.type==='coins'){const m=baseMoney()*80;addMoney(m);found.money+=m;sfx.coin()}
+    if(c.type==='chest'){const g=30,m=baseMoney()*250;S.gems+=g;addMoney(m);found.gems+=g;found.money+=m;found.chest=true;sfx.jar();burstConfetti();msg.textContent='DU HITTADE SKATTEN! +30 💎 och massor av pengar!';upd();finish();return}
+    if(c.type==='gems'){S.gems+=4;found.gems+=4;sfx.chest()}
+    else if(c.type==='coins'){const m=baseMoney()*40;addMoney(m);found.money+=m;sfx.coin()}
     else if(c.type==='worms'){S.worms=Math.min(MAX_WORMS+4,S.worms+2);found.worms+=2;sfx.coin();msg.textContent='+2 maskar till fisket!'}
     else beep(220,.1,'triangle',.04,-60);
     upd();save();
@@ -2432,7 +2436,7 @@ function showBonus(){
     itemRow(icon('🎈'),'Ballongjakten',`Smäll så många ballonger du hinner på 25 sekunder. Rekord: ${S.best.balloons||0}`,h('button',{class:'btn sm',on:{click:playBalloons}},tk(1))),
     itemRow(icon('⛏️'),'Skattgrävningen','Gräv i sanden och hitta den gömda skattkistan med 7 spadtag.',h('button',{class:'btn sm',on:{click:playDig}},tk(1))),
     itemRow(icon('🎣'),'Fiskesjön',`Fiska med maskar (${S.worms}/${MAX_WORMS}).`,h('button',{class:'btn sm',on:{click:showFishing}},'Fiska')),
-    h('div',{class:'note'},'Biljetter får du var tionde minut, från guldträd, presentballonger och dagens belöning.')]});
+    h('div',{class:'note'},'Biljetter får du var tjugonde minut, från guldträd, presentballonger och dagens belöning.')]});
 }
 function showSettings(confirmReset){
   openModal({title:'Inställningar',body:[
@@ -2501,14 +2505,18 @@ setInterval(updateMoneyTarget,1500);
 
 let last=performance.now(),running=false;
 let bgSkip=0;
-function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;update(dt);bgSkip=(bgSkip+1)%3;if(!modalOpen||bgSkip===0)render();requestAnimationFrame(frame)}
+let frameErrs=0;
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  // ett oväntat fel i en enskild bildruta får aldrig frysa spelet
+  try{update(dt);bgSkip=(bgSkip+1)%3;if(!modalOpen||bgSkip===0)render()}catch(e){if(frameErrs++<3)console.error('Nalle Blaster:',e)}
+  requestAnimationFrame(frame)}
 
 function start(fromHot){
   if(running)return;running=true;
   resize();buildTrack();buildWorldDecor();setupIdle();updateUI();
   if(!fromHot){
     const away=(Date.now()-(S.lastSeen||Date.now()))/1000;
-    if(away>90&&S.mps>0){const secs=Math.min(away,7200);const amt=S.mps*secs*.5;if(amt>=1)showWelcomeBack(amt,secs)}
+    if(away>90&&S.mps>0){const secs=Math.min(away,3600);const amt=S.mps*secs*.25;if(amt>=1)showWelcomeBack(amt,secs)}
   }
   last=performance.now();requestAnimationFrame(frame);
   loadPrizeArt();loadBearStyle(S.bearStyle||'3d');
