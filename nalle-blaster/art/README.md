@@ -17,3 +17,19 @@ Spelet (`../index.html`) har arket inbakat som data-URI, så filerna här behöv
 - `bear3d_sheet.json` – ankare (fötter), framtass för vapnet och huvudets topp.
 
 I spelet väljer man stil under Inställningar → Björnstil.
+
+## Utstyrsel (hattar, glasögon, halsband, mantlar)
+
+Sakerna björnen kan ha på sig ritas med kod i spelet, men de måste sitta rätt i varje
+animationsbild. Därför mäts fästpunkterna i förväg:
+
+- `anchors3d.py` – mäter 3D-modellen bild för bild: huvudets mitt, hjässan, ögonen och
+  huvudets storlek. Körs med `python3 anchors3d.py` (numpy, Pillow, scipy).
+- `anchors_pixel.py` – hittar samma punkter i pixelarket med avståndstransform
+  (huvudet är den tjockaste runda delen i figurens övre halva).
+- `bear3d_anchors.json`, `bear_anchors.json` – resultatet: per animation och bild
+  `[huvud x,y, hjässa x,y, ögon x,y, hals x,y, rygg x,y, lutning]` i pixlar räknat
+  från fotankaret, plus huvudets radie.
+
+Spelet räknar fram hals och rygg ur hjässan, så att samma plagg sitter lika på båda
+björnstilarna. Filerna är inbakade i `../index.html`.
