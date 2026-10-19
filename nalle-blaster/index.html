@@ -2324,10 +2324,10 @@ const Ads=(()=>{
       P=(B&&B.AdMob)||(cap.Plugins&&cap.Plugins.AdMob)||null;
       if(B&&B.App)setupApp(B.App);
       if(!P){state='off';log('AdMob-pluginet saknas');return}
-      if(!listening){listening=true;
-        await P.addListener('onRewardedVideoAdReward',()=>{if(cur)cur.rewarded=true});
-        await P.addListener('onRewardedVideoAdDismissed',()=>finish('dismissed'));
-        await P.addListener('onRewardedVideoAdFailedToShow',()=>finish('failed'))}
+      if(!listening){listening=true;  // väntar inte på svar: lyssnarna ska aldrig kunna stoppa starten
+        P.addListener('onRewardedVideoAdReward',()=>{if(cur)cur.rewarded=true});
+        P.addListener('onRewardedVideoAdDismissed',()=>finish('dismissed'));
+        P.addListener('onRewardedVideoAdFailedToShow',()=>finish('failed'))}
       let info=null;
       try{
         info=await P.requestConsentInfo({tagForUnderAgeOfConsent:ADS_CFG.childDirected});
