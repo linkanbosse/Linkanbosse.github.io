@@ -164,6 +164,22 @@ jobs:
               s, b = re.subn(r'versionName\s+"[^"]*"', f'versionName "1.0.{build}"', s, count=1)
               if a != 1 or b != 1:
                   die('Hittade inte versionCode/versionName i app/build.gradle')
+              if 'NALLE_DEBUG_KEYSTORE' not in s:
+                  # test-APK:n signeras alltid med repots fasta testnyckel (annars skapar Gradle en ny vid varje bygge)
+                  s += '''
+          android {
+              signingConfigs {
+                  debug {
+                      if (System.getenv('NALLE_DEBUG_KEYSTORE')) {
+                          storeFile file(System.getenv('NALLE_DEBUG_KEYSTORE'))
+                          storePassword 'android'
+                          keyAlias 'androiddebugkey'
+                          keyPassword 'android'
+                      }
+                  }
+              }
+          }
+          '''
               path.write_text(s, encoding='utf-8')
 
 
@@ -305,12 +321,24 @@ jobs:
           cp .github/keys/nalle-blaster/debug.keystore ~/.android/debug.keystore
 
       - name: Bygg test-APK
+        env:
+          NALLE_DEBUG_KEYSTORE: ${{ github.workspace }}/.github/keys/nalle-blaster/debug.keystore
         run: |
           set -euo pipefail
           cd app/android
           chmod +x gradlew
           ./gradlew --no-daemon assembleDebug
           cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/out/nalle-blaster-test.apk"
+          # kontroll: APK:n måste vara signerad med repots fasta testnyckel
+          WANT=$(keytool -list -v -keystore "$NALLE_DEBUG_KEYSTORE" -storepass android | grep -m1 'SHA256:' | awk '{print $2}' | tr -d ':' | tr 'A-F' 'a-f')
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort -V | tail -1)
+          if [ -x "$ANDROID_HOME/build-tools/$BT/apksigner" ]; then
+            GOT=$("$ANDROID_HOME/build-tools/$BT/apksigner" verify --print-certs "$GITHUB_WORKSPACE/out/nalle-blaster-test.apk" | grep -m1 'certificate SHA-256 digest' | awk '{print $NF}')
+            echo "Testnyckel: $WANT  APK: $GOT"
+            if [ "$GOT" != "$WANT" ]; then echo "::error::Test-APK:n är inte signerad med den fasta testnyckeln."; exit 1; fi
+          else
+            echo "::warning::apksigner saknas – kunde inte kontrollera signaturen."
+          fi
 
       - name: Bygg signerad AAB för Google Play
         if: env.KS_PASS != ''
