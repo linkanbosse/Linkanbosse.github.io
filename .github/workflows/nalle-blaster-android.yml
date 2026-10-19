@@ -1,0 +1,358 @@
+# Bygger Nalle Blaster som Android-app med belöningsannonser (Capacitor 8 + AdMob) – helt i molnet.
+#
+# Körs när något i nalle-blaster/ (spelet, privacy.html, logo.png) eller den här filen ändras på main.
+#
+# Resultat efter varje körning:
+#   • Test-APK för din telefon:  Releases → "nalle-blaster-test" → nalle-blaster-test.apk
+#   • Signerad .aab för Google Play (när hemligheten KEYSTORE_PASSWORD finns):
+#     Actions → körningen → Artifacts
+#
+# Inställningar i repot (Settings → Secrets and variables → Actions):
+#   • Variabel ADMOB_APP_ID      ditt AdMob App ID (ca-app-pub-…~…). Saknas den används Googles test-ID.
+#   • Hemlighet KEYSTORE_PASSWORD minst 12 tecken. Behövs först när du ska ladda upp till Google Play.
+#     Tappa aldrig bort den – den låser upp nyckeln som alla framtida uppdateringar signeras med.
+name: Nalle Blaster Android-app
+
+on:
+  push:
+    branches: [main]
+    paths: [nalle-blaster/index.html, nalle-blaster/logo.png, nalle-blaster/privacy.html, .github/workflows/nalle-blaster-android.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # för att spara signeringsnycklarna i repot första gången och publicera test-APK:n
+
+concurrency:
+  group: nalle-blaster-android
+  cancel-in-progress: false
+
+env:
+  APP_ID: io.github.linkanbosse.nalleblaster   # appens unika ID på Google Play. Ändra aldrig efter första publiceringen.
+  APP_NAME: Nalle Blaster
+  ADMOB_APP_ID: ${{ vars.ADMOB_APP_ID || 'ca-app-pub-3940256099942544~3347511713' }}
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Skapa Capacitor-projekt
+        run: |
+          set -euo pipefail
+          mkdir -p app/www app/src out
+          cp nalle-blaster/index.html app/www/index.html
+          if [ -f nalle-blaster/privacy.html ]; then cp nalle-blaster/privacy.html app/www/; fi
+          cd app
+          echo '{"name":"nalle-blaster-app","private":true,"version":"1.0.0"}' > package.json
+          npm install --no-audit --no-fund @capacitor/core@^8 @capacitor/android@^8 @capacitor/app@^8 @capacitor-community/admob@^8
+          npm install --no-audit --no-fund --save-dev @capacitor/cli@^8 esbuild
+          npm ls --depth=0 || true
+          # Brygga mellan spelet och de inbyggda Android-funktionerna (annonser och bakåtknappen)
+          cat > src/native.js <<'EOF'
+          import { Capacitor } from '@capacitor/core';
+          import { AdMob } from '@capacitor-community/admob';
+          import { App } from '@capacitor/app';
+          window.NalleNative = { Capacitor, AdMob, App };
+          EOF
+          npx esbuild src/native.js --bundle --format=iife --minify --target=es2020 --outfile=www/nalle-native.js
+          cat > capacitor.config.json <<EOF
+          {
+            "appId": "${APP_ID}",
+            "appName": "${APP_NAME}",
+            "webDir": "www",
+            "backgroundColor": "#33261c",
+            "plugins": { "SystemBars": { "style": "DARK" } }
+          }
+          EOF
+          npx cap telemetry off || true
+          npx cap add android
+
+      - name: Anpassa Android-projektet (AdMob, ikon, startskärm, version)
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet pillow
+          cat > "$RUNNER_TEMP/android_patch.py" <<'PY'
+          #!/usr/bin/env python3
+          """Anpassar det genererade Capacitor-projektet för Nalle Blaster.
+
+          - AdMob App ID i AndroidManifest (appen kraschar vid start utan det)
+          - låser spelet i stående läge
+          - versionsnummer från GitHub Actions (krävs för uppdateringar på Google Play)
+          - appikon och startskärm med björnen från spelet (eller logo.png om den finns i repot)
+
+          Användning: android_patch.py <android-mapp> <admob-app-id> <byggnummer> <index.html> [logo.png] [utmapp]
+          """
+          import base64
+          import io
+          import pathlib
+          import re
+          import sys
+          from xml.sax.saxutils import escape
+
+          from PIL import Image, ImageChops, ImageDraw
+
+          HONEY = (255, 207, 69)
+          HONEY_LIGHT = (255, 226, 122)
+          HONEY_DARK = (243, 160, 42)
+          BARK = (51, 38, 28)
+
+
+          def die(msg):
+              print('::error::' + msg)
+              sys.exit(1)
+
+
+          def patch_manifest(path: pathlib.Path):
+              s = path.read_text(encoding='utf-8')
+              meta = ('\n        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" '
+                      'android:value="@string/admob_app_id" />\n')
+              if 'com.google.android.gms.ads.APPLICATION_ID' not in s:
+                  s, n = re.subn(r'(<application\b[^>]*>)', lambda m: m.group(1) + meta, s, count=1)
+                  if n != 1:
+                      die('Hittade inte <application> i AndroidManifest.xml')
+              if 'android:screenOrientation' not in s:
+                  s, n = re.subn(r'(android:name="\.MainActivity")', r'\1\n            android:screenOrientation="portrait"', s, count=1)
+                  if n != 1:
+                      die('Hittade inte MainActivity i AndroidManifest.xml')
+              path.write_text(s, encoding='utf-8')
+
+
+          def patch_strings(path: pathlib.Path, app_id: str):
+              if not re.fullmatch(r'ca-app-pub-\d{16}~\d{10}', app_id):
+                  die(f'ADMOB_APP_ID ser fel ut: "{app_id}". Det ska se ut som ca-app-pub-1234567890123456~1234567890 (med ~, inte /).')
+              s = path.read_text(encoding='utf-8')
+              line = f'<string name="admob_app_id">{escape(app_id)}</string>'
+              if 'name="admob_app_id"' in s:
+                  s = re.sub(r'<string name="admob_app_id">[^<]*</string>', line, s)
+              else:
+                  s = s.replace('</resources>', f'    {line}\n</resources>')
+              path.write_text(s, encoding='utf-8')
+
+
+          def patch_styles(path: pathlib.Path):
+              s = path.read_text(encoding='utf-8')
+              if 'windowSplashScreenBackground' in s:
+                  return
+              s2, n = re.subn(r'(<style name="AppTheme\.NoActionBarLaunch"[^>]*>)',
+                              r'\1\n        <item name="windowSplashScreenBackground">#33261c</item>', s, count=1)
+              if n == 1:
+                  path.write_text(s2, encoding='utf-8')
+              else:
+                  print('::warning::Hittade inte startskärmens stil – behåller standardfärgen')
+
+
+          def patch_gradle(path: pathlib.Path, build: int):
+              s = path.read_text(encoding='utf-8')
+              s, a = re.subn(r'versionCode\s+\d+', f'versionCode {build}', s, count=1)
+              s, b = re.subn(r'versionName\s+"[^"]*"', f'versionName "1.0.{build}"', s, count=1)
+              if a != 1 or b != 1:
+                  die('Hittade inte versionCode/versionName i app/build.gradle')
+              path.write_text(s, encoding='utf-8')
+
+
+          def bear_from_game(index_html: pathlib.Path) -> Image.Image:
+              """Klipper ut björnen (framifrån, vinkande) ur 3D-spritearket som ligger inbäddat i spelet."""
+              s = index_html.read_text(encoding='utf-8')
+              m = re.search(r"const BEAR3D_PNG='data:image/png;base64,([^']+)'", s)
+              if not m:
+                  die('Hittade inte BEAR3D_PNG i index.html – lägg en logo.png i repot i stället')
+              sheet = Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGBA')
+              cell = sheet.crop((128, 512, 256, 640))  # rad "hurt", ruta 2: björnen tittar rakt fram
+              return cell
+
+
+          def trim(img: Image.Image) -> Image.Image:
+              box = img.getchannel('A').point(lambda a: 255 if a > 8 else 0).getbbox()
+              return img.crop(box) if box else img
+
+
+          def fit(img: Image.Image, w: int, h: int) -> Image.Image:
+              k = min(w / img.width, h / img.height)
+              return img.resize((max(1, round(img.width * k)), max(1, round(img.height * k))), Image.Resampling.LANCZOS)
+
+
+          def gradient(size, top, mid, bottom):
+              w, h = size
+              g = Image.new('RGBA', (1, h))
+              for y in range(h):
+                  t = y / max(1, h - 1)
+                  a, b, u = (top, mid, t * 2) if t < .5 else (mid, bottom, (t - .5) * 2)
+                  g.putpixel((0, y), tuple(round(a[i] + (b[i] - a[i]) * u) for i in range(3)) + (255,))
+              return g.resize((w, h))
+
+
+          def head(bear: Image.Image) -> Image.Image:
+              b = trim(bear)
+              return b.crop((0, 0, b.width, round(b.height * .78)))  # huvud och överkropp syns bäst i liten storlek
+
+
+          def make_icon(bear, px, shape):
+              S = px * 4  # rita stort och skala ned för mjuka kanter
+              bg = gradient((S, S), HONEY_LIGHT, HONEY, HONEY_DARK)
+              mask = Image.new('L', (S, S), 0)
+              d = ImageDraw.Draw(mask)
+              if shape == 'round':
+                  d.ellipse((0, 0, S - 1, S - 1), fill=255)
+              elif shape == 'full':  # Google Play rundar själv hörnen
+                  d.rectangle((0, 0, S - 1, S - 1), fill=255)
+              else:
+                  d.rounded_rectangle((0, 0, S - 1, S - 1), radius=round(S * .22), fill=255)
+              out = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+              out.paste(bg, (0, 0), mask)
+              hb = fit(head(bear), round(S * .78), round(S * .74))
+              out.alpha_composite(hb, ((S - hb.width) // 2, S - hb.height + 2))  # snittet i magen hamnar utanför kanten
+              out.putalpha(ImageChops.multiply(out.getchannel('A'), mask))
+              return out.resize((px, px), Image.Resampling.LANCZOS)
+
+
+          def make_foreground(bear, px):
+              S = px * 4
+              out = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+              # huvudet inom den säkra zonen (66 av 108 dp); snittet i magen hamnar under den synliga cirkeln
+              hb = fit(head(bear), round(S * .62), round(S * .57))
+              out.alpha_composite(hb, ((S - hb.width) // 2, round(S * 92 / 108) - hb.height))
+              return out.resize((px, px), Image.Resampling.LANCZOS)
+
+
+          def make_splash(bear, w, h):
+              out = Image.new('RGBA', (w, h), BARK + (255,))
+              glow = Image.new('L', (w, h), 0)
+              r = round(min(w, h) * .34)
+              ImageDraw.Draw(glow).ellipse((w // 2 - r, h // 2 - r, w // 2 + r, h // 2 + r), fill=70)
+              out.paste(Image.new('RGBA', (w, h), HONEY + (255,)), (0, 0), glow)
+              b = fit(trim(bear), round(min(w, h) * .42), round(min(w, h) * .42))
+              out.alpha_composite(b, ((w - b.width) // 2, (h - b.height) // 2))
+              return out.convert('RGB')
+
+
+          def main():
+              if len(sys.argv) < 5:
+                  die(__doc__)
+              android = pathlib.Path(sys.argv[1])
+              app_id, build, index_html = sys.argv[2], int(sys.argv[3]), pathlib.Path(sys.argv[4])
+              logo = pathlib.Path(sys.argv[5]) if len(sys.argv) > 5 and sys.argv[5] else None
+              outdir = pathlib.Path(sys.argv[6]) if len(sys.argv) > 6 else pathlib.Path('.')
+              main_dir = android / 'app' / 'src' / 'main'
+              res = main_dir / 'res'
+
+              patch_manifest(main_dir / 'AndroidManifest.xml')
+              patch_strings(res / 'values' / 'strings.xml', app_id)
+              patch_styles(res / 'values' / 'styles.xml')
+              patch_gradle(android / 'app' / 'build.gradle', build)
+
+              bear = Image.open(logo).convert('RGBA') if logo and logo.exists() else bear_from_game(index_html)
+              dens = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
+              for name, k in dens.items():
+                  d = res / f'mipmap-{name}'
+                  d.mkdir(parents=True, exist_ok=True)
+                  make_icon(bear, round(48 * k), 'square').save(d / 'ic_launcher.png')
+                  make_icon(bear, round(48 * k), 'round').save(d / 'ic_launcher_round.png')
+                  make_foreground(bear, round(108 * k)).save(d / 'ic_launcher_foreground.png')
+              (res / 'values' / 'ic_launcher_background.xml').write_text(
+                  '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#FFCF45</color>\n</resources>\n',
+                  encoding='utf-8')
+              n = 0
+              for sp in res.glob('drawable*/splash.png'):
+                  with Image.open(sp) as im:
+                      w, h = im.size
+                  make_splash(bear, w, h).save(sp)
+                  n += 1
+              outdir.mkdir(parents=True, exist_ok=True)
+              make_icon(bear, 512, 'full').save(outdir / 'play-store-ikon-512.png')
+              print(f'Klart: manifest, strängar, version {build}, ikoner i {len(dens)} storlekar, {n} startbilder')
+
+
+          if __name__ == '__main__':
+              main()
+          PY
+          LOGO=""
+          if [ -f nalle-blaster/logo.png ]; then LOGO="$PWD/nalle-blaster/logo.png"; fi
+          python "$RUNNER_TEMP/android_patch.py" app/android "$ADMOB_APP_ID" "$GITHUB_RUN_NUMBER" nalle-blaster/index.html "$LOGO" out
+          cd app && npx cap sync android
+
+      - name: Fast testnyckel (nya test-APK:er installeras ovanpå de gamla och sparat spel finns kvar)
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p ~/.android .github/keys/nalle-blaster
+          if [ ! -f .github/keys/nalle-blaster/debug.keystore ]; then
+            keytool -genkeypair -keystore .github/keys/nalle-blaster/debug.keystore -storepass android -keypass android \
+              -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            git add .github/keys/nalle-blaster/debug.keystore
+            git commit -m "Fast testnyckel för Android-bygget [skip ci]"
+            if ! { git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME"; }; then
+              echo "::warning::Kunde inte spara testnyckeln i repot. Varje ny test-APK måste då avinstalleras innan den installeras."
+            fi
+          fi
+          cp .github/keys/nalle-blaster/debug.keystore ~/.android/debug.keystore
+
+      - name: Bygg test-APK
+        run: |
+          set -euo pipefail
+          cd app/android
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/out/nalle-blaster-test.apk"
+
+      - name: Bygg signerad AAB för Google Play
+        if: env.KS_PASS != ''
+        run: |
+          set -euo pipefail
+          if [ ${#KS_PASS} -lt 12 ]; then echo "::error::KEYSTORE_PASSWORD måste vara minst 12 tecken."; exit 1; fi
+          # nyckelfilens eget lösenord härleds ur hemligheten, så att å, ä, ö och andra tecken fungerar
+          STORE_PASS=$(printf '%s' "$KS_PASS" | sha256sum | cut -c1-40)
+          echo "::add-mask::$STORE_PASS"
+          KS="$RUNNER_TEMP/upload.keystore"
+          if [ -f .github/keys/nalle-blaster/upload.keystore.enc ]; then
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in .github/keys/nalle-blaster/upload.keystore.enc -out "$KS" -pass env:KS_PASS \
+              || { rm -f "$KS"; echo "::error::Fel KEYSTORE_PASSWORD – det måste vara samma lösenord som när nyckeln skapades."; exit 1; }
+          else
+            keytool -genkeypair -keystore "$KS" -storetype PKCS12 -storepass "$STORE_PASS" -keypass "$STORE_PASS" -alias upload \
+              -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=$APP_NAME, C=SE"
+            openssl enc -aes-256-cbc -salt -pbkdf2 -iter 200000 -in "$KS" -out .github/keys/nalle-blaster/upload.keystore.enc -pass env:KS_PASS
+            git add .github/keys/nalle-blaster/upload.keystore.enc
+            git commit -m "Krypterad uppladdningsnyckel för Google Play [skip ci]"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+          cd app/android
+          ./gradlew --no-daemon bundleRelease
+          AAB=app/build/outputs/bundle/release/app-release.aab
+          jarsigner -sigalg SHA256withRSA -digestalg SHA-256 -keystore "$KS" -storepass "$STORE_PASS" "$AAB" upload
+          jarsigner -verify "$AAB"
+          cp "$AAB" "$GITHUB_WORKSPACE/out/nalle-blaster-$GITHUB_RUN_NUMBER.aab"
+          rm -f "$KS"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nalle-blaster-${{ github.run_number }}
+          path: out/
+          retention-days: 30
+
+      - name: Publicera test-APK under Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release delete nalle-blaster-test --yes --cleanup-tag 2>/dev/null || true
+          gh release create nalle-blaster-test out/nalle-blaster-test.apk --prerelease --target "$GITHUB_SHA" \
+            --title "Nalle Blaster – test-APK (bygge $GITHUB_RUN_NUMBER)" \
+            --notes "Ladda ner nalle-blaster-test.apk på telefonen och installera den. Visar testannonser tills du bytt till dina egna AdMob-ID:n."

@@ -233,8 +233,17 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
 .codein:focus{outline:3px solid var(--honey);outline-offset:1px}
 .codemsg{font-size:13px;font-weight:600;min-height:1.3em;text-align:center}
 .codemsg.ok{color:#3f8a24}.codemsg.err{color:#c0392b}
+/* ---------- belöningsannonser (bara i Android-appen) ---------- */
+.btn.ad{background:linear-gradient(#cfa6f7,#8b4fd6);color:#fff}
+.play{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#fff;color:#8b4fd6;font-size:10px;line-height:1;border:2px solid var(--ink);flex:none;padding-left:2px;box-sizing:border-box;text-shadow:none}
+.btn.sm .play{width:17px;height:17px;font-size:8px}
+.btn.ad.wait{filter:saturate(.3);opacity:.7}
+#adBoostBtn{display:flex;align-items:center;gap:6px;color:#fff;background:linear-gradient(#cfa6f7,#8b4fd6);border:2.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);border-radius:12px;padding:3px 9px 3px 4px;font-size:13px;font-weight:700;white-space:nowrap;animation:adpulse 2.6s ease-in-out infinite;transform-origin:left center}
+#adBoostBtn[hidden]{display:none}
+#adBoostBtn:active{animation:none;transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+@keyframes adpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 @media (max-height:740px){.tool{width:54px;height:47px}.tool .e{font-size:18px}.tool .t{font-size:11px}.tool.big{width:58px;height:54px}.col{gap:7px}}
-@media (prefers-reduced-motion: reduce){.dot.show,.modal,.card.bump{animation:none}}
+@media (prefers-reduced-motion: reduce){.dot.show,.modal,.card.bump,#adBoostBtn{animation:none}}
 </style>
 
 </head>
@@ -262,6 +271,7 @@ button:focus-visible{outline:3px solid #fff;outline-offset:2px}
   <div id="leftTop">
     <button id="mapBtn" aria-label="Öppna kartan"><canvas id="mmap" width="176" height="176"></canvas><span class="lbl ol">Karta</span></button>
     <button id="evoBtn" aria-label="Björnens utveckling"><span class="dot" id="dotEvo"></span><span class="n ol" id="evoName">🧸 Björnunge</span><span id="evoBar"><span id="evoFill" style="display:block"></span></span></button>
+    <button id="adBoostBtn" class="ol" hidden aria-label="Titta på reklam för dubbla pengar i 30 minuter"><span class="play">▶</span>2× 🍯 30 min</button>
     <div id="boostRow"></div>
   </div>
   <div id="eventBanner" class="ol" hidden></div>
@@ -456,7 +466,7 @@ const PATHS={
 const fresh=()=>({money:0,gems:0,lv:{power:1,speed:1,money:1},world:1,sub:1,rebirths:0,
   skin:'brun',skins:['brun'],gun:'blaster',guns:['blaster'],auto:false,sound:true,
   outfit:{hat:null,face:null,neck:null,back:null},accs:[],
-  boosts:{money:0,dmg:0},giftAt:0,mps:0,lastSeen:Date.now(),
+  boosts:{money:0,dmg:0},giftAt:0,mps:0,lastSeen:Date.now(),ads:{day:'',tix:0},
   evo:{stage:0,xp:0,picks:[]},seen:[0],
   team:['lille',null,null],bears:{lille:{stars:1,dup:0}},music:true,worms:MAX_WORMS,wormAt:Date.now(),fish:{},maxWorld:1,
   tickets:2,ticketAt:Date.now(),wheelFreeAt:0,daily:{day:0,last:''},best:{balloons:0},
@@ -465,7 +475,7 @@ let S=fresh();
 const KEY='nalle-blaster-v1';
 function merge(d){const f=fresh();S=Object.assign(f,d);S.lv=Object.assign(f.lv,d.lv);S.mis=Object.assign(fresh().mis,d.mis);S.boosts=Object.assign(fresh().boosts,d.boosts);S.evo=Object.assign(fresh().evo,d.evo);S.stats=Object.assign(fresh().stats,d.stats);if(!Array.isArray(S.seen))S.seen=[0];
   if(!Array.isArray(S.team))S.team=['lille',null,null];if(!S.bears||!S.bears.lille)S.bears=Object.assign({lille:{stars:1,dup:0}},S.bears||{});
-  if(!S.fish)S.fish={};if(!S.outfit||typeof S.outfit!=='object')S.outfit={};S.accs=(S.accs||[]).filter(k=>ACCS[k]);for(const sl of ACC_SLOTS){const k=S.outfit[sl.key];if(k&&(!ACCS[k]||!S.accs.includes(k)))S.outfit[sl.key]=null}if(typeof S.evo.stage!=='number'||S.evo.stage<0)S.evo.stage=0;S.evo.stage=Math.min(EVO_MAX,S.evo.stage);if(!Array.isArray(S.evo.picks))S.evo.picks=[];S.evo.picks=S.evo.picks.filter(k=>PATHS[k]);recalcRange();if(!S.daily)S.daily={day:0,last:''};if(!S.best)S.best={balloons:0};if(S.tickets==null){S.tickets=3;S.ticketAt=Date.now()}if(!GUNS[S.gun])S.gun='blaster';S.guns=(S.guns||['blaster']).filter(k=>GUNS[k]);S.maxWorld=Math.max(S.maxWorld||1,S.world)}
+  if(!S.fish)S.fish={};if(!S.outfit||typeof S.outfit!=='object')S.outfit={};S.accs=(S.accs||[]).filter(k=>ACCS[k]);for(const sl of ACC_SLOTS){const k=S.outfit[sl.key];if(k&&(!ACCS[k]||!S.accs.includes(k)))S.outfit[sl.key]=null}if(typeof S.evo.stage!=='number'||S.evo.stage<0)S.evo.stage=0;S.evo.stage=Math.min(EVO_MAX,S.evo.stage);if(!Array.isArray(S.evo.picks))S.evo.picks=[];S.evo.picks=S.evo.picks.filter(k=>PATHS[k]);recalcRange();if(!S.daily)S.daily={day:0,last:''};if(!S.best)S.best={balloons:0};if(!S.ads||typeof S.ads!=='object')S.ads={day:'',tix:0};if(S.tickets==null){S.tickets=3;S.ticketAt=Date.now()}if(!GUNS[S.gun])S.gun='blaster';S.guns=(S.guns||['blaster']).filter(k=>GUNS[k]);S.maxWorld=Math.max(S.maxWorld||1,S.world)}
 function save(){S.lastSeen=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function load(){try{const r=localStorage.getItem(KEY);if(r){merge(JSON.parse(r));return true}}catch(e){}return false}
 
@@ -726,7 +736,7 @@ function setupChallenge(){
   mode='challenge';trees=[];chests=[];bullets=[];parts=[];texts=[];stumps=[];bolts=[];wfx=[];
   makeArena(430);
   bear.x=0;bear.y=0;buildHelpers();placeHelpers();resetFx();cam.x=0;cam.y=0;
-  chal.time=CHAL_TIME;chal.max=CHAL_TIME;
+  chal.time=CHAL_TIME;chal.max=CHAL_TIME;chal.revived=false;
   const bi=biome().i;
   if(isBoss()){
     const b=newTree(0,-190,bi,{boss:true,r:68,hpMul:30/REG[bi].hp,type:REG[bi].trees[0]});b.grow=1;b.mm=1;trees.push(b);
@@ -2206,6 +2216,7 @@ function updateUI(){
   $('rageVignette').classList.toggle('on',rage>0);
   refillWorms();refillTickets();
   $('dotBonus').classList.toggle('show',Date.now()>=S.wheelFreeAt||S.tickets>=MAX_TICKETS||dailyReady());
+  {const ab=$('adBoostBtn'),on=mode==='idle'&&Ads.ready()&&adBoostOK();if(ab.hidden===on)ab.hidden=!on}
   $('dotFish').classList.toggle('show',S.worms>=MAX_WORMS);
   $('dotTeam').classList.toggle('show',S.gems>=JARS[0].cost&&S.stats.jars===0);
   // event banner
@@ -2267,6 +2278,103 @@ function transition(fn,txt){
   setTimeout(()=>{done=true;tr.hidden=true},1100);
 }
 
+/* ================= reklam: belöningsannonser via AdMob (bara i Android-appen) =================
+   Spelaren väljer alltid själv att titta och får en belöning i spelet – aldrig riktiga pengar.
+   På webben (GitHub Pages) finns ingen reklam och knapparna visas inte. */
+const ADS_CFG={
+  rewardedId:'ca-app-pub-3940256099942544/5224354917', // Googles test-ID för belöningsannonser. Byt till ditt eget från AdMob.
+  testing:true,                 // true = testannonser. Sätt false först när du bytt till dina egna ID:n.
+  childDirected:false,          // true om spelet riktar sig till barn under 13 år
+  maxRating:'ParentalGuidance'  // General | ParentalGuidance | Teen | MatureAudience
+};
+const AD_BOOST_MS=30*60000,AD_BOOST_MAX=2*3600000,AD_TIX_N=2,AD_TIX_DAY=4,AD_REVIVE_S=15;
+const Ads=(()=>{
+  const cap=window.Capacitor;
+  const native=!!(cap&&typeof cap.isNativePlatform==='function'&&cap.isNativePlatform());
+  let P=null,state='off',privacy=false,retry=0,retryT=null,cur=null,showAt=0,listening=false;
+  const log=(...a)=>{try{console.warn('Nalle Blaster reklam:',...a)}catch(_){}};
+  const loadBridge=()=>new Promise(res=>{
+    if(window.NalleNative)return res(window.NalleNative);
+    const s=document.createElement('script');s.src='nalle-native.js';s.onload=()=>res(window.NalleNative||null);s.onerror=()=>res(null);document.head.appendChild(s)});
+  function refresh(){
+    const ok=state==='ready';
+    document.querySelectorAll('.btn.ad').forEach(b=>b.classList.toggle('wait',!ok));
+    try{updateUI()}catch(_){}
+  }
+  function resumeAudio(){try{if(AC&&AC.state==='suspended')AC.resume();if(S.music&&AC)startMusic()}catch(_){}}
+  async function load(){
+    if(state!=='idle')return;state='loading';
+    try{await P.prepareRewardVideoAd({adId:ADS_CFG.rewardedId,isTesting:ADS_CFG.testing});state='ready';retry=0}
+    catch(e){state='idle';retry=Math.min(retry+1,6);clearTimeout(retryT);retryT=setTimeout(load,Math.min(300000,15000*Math.pow(2,retry-1)));log('kunde inte ladda',e&&e.message||e)}
+    refresh();
+  }
+  function finish(why){
+    const c=cur;if(!c||c.done)return;
+    // belöningshändelsen kan komma strax efter att reklamen stängts
+    setTimeout(()=>{if(c.done)return;c.done=true;cur=null;state='idle';resumeAudio();
+      if(c.rewarded){try{c.cb()}catch(e){log(e)}save();updateUI()}
+      else if(why==='failed')toast('Reklamen kunde inte visas. Försök igen om en stund.');
+      else toast('Titta klart på reklamen för att få belöningen.');
+      load()},why==='dismissed'?400:0);
+  }
+  async function init(){
+    if(!native||state!=='off')return;state='init';
+    try{
+      const B=await loadBridge();
+      P=(B&&B.AdMob)||(cap.Plugins&&cap.Plugins.AdMob)||null;
+      if(B&&B.App)setupApp(B.App);
+      if(!P){state='off';log('AdMob-pluginet saknas');return}
+      if(!listening){listening=true;
+        await P.addListener('onRewardedVideoAdReward',()=>{if(cur)cur.rewarded=true});
+        await P.addListener('onRewardedVideoAdDismissed',()=>finish('dismissed'));
+        await P.addListener('onRewardedVideoAdFailedToShow',()=>finish('failed'))}
+      let info=null;
+      try{
+        info=await P.requestConsentInfo({tagForUnderAgeOfConsent:ADS_CFG.childDirected});
+        if(info&&info.status==='REQUIRED'&&info.isConsentFormAvailable)info=await P.showConsentForm();
+        privacy=!!info&&info.privacyOptionsRequirementStatus==='REQUIRED';
+      }catch(e){log('samtycke',e&&e.message||e)}
+      if(info&&info.canRequestAds===false){state='off';refresh();return}
+      await P.initialize({initializeForTesting:ADS_CFG.testing,tagForChildDirectedTreatment:ADS_CFG.childDirected,tagForUnderAgeOfConsent:ADS_CFG.childDirected,maxAdContentRating:ADS_CFG.maxRating});
+      state='idle';load();
+    }catch(e){state='off';log('start',e&&e.message||e)}
+    refresh();
+  }
+  function show(cb){
+    if(state==='showing'&&Date.now()-showAt>120000&&cur)finish('dismissed');
+    if(state!=='ready'){toast(state==='off'?'Reklam är inte tillgänglig just nu.':'Reklamen laddar – försök igen om en liten stund.');if(state==='idle')load();return}
+    state='showing';showAt=Date.now();cur={cb,rewarded:false,done:false};
+    try{stopMusic();if(AC&&AC.state==='running')AC.suspend()}catch(_){}
+    P.showRewardVideoAd().then(()=>{if(cur)cur.rewarded=true}).catch(e=>{log('visning',e&&e.message||e);finish('failed')});
+  }
+  // säkerhetsnät: om stäng-händelsen uteblir när spelaren kommer tillbaka
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state==='showing'){const c=cur;setTimeout(()=>{if(cur===c&&state==='showing')finish('dismissed')},5000)}});
+  async function openPrivacy(){try{await P.showPrivacyOptionsForm()}catch(e){toast('Kunde inte öppna reklaminställningarna.')}
+    if(state==='off')init()}  // nytt samtycke: försök starta reklamen igen
+  return{init,show,openPrivacy,
+    on:()=>native&&state!=='off',   // visa reklamknappar? (bara i appen)
+    ready:()=>state==='ready',
+    privacy:()=>native&&!!P&&privacy};
+})();
+// Androids bakåtknapp: stäng öppen ruta i stället för att avsluta spelet
+function setupApp(App){
+  try{
+    App.addListener('backButton',()=>{
+      const L=$('modalLayer'),x=L&&!L.hidden?L.querySelector('.mclose'):null;
+      if(L&&!L.hidden){if(x)x.click();return}
+      if(mode==='challenge'||!$('trans').hidden)return;
+      save();App.minimizeApp();
+    });
+    App.addListener('pause',()=>save());
+  }catch(e){}
+}
+function adTixLeft(){const t=dayStr(new Date());if(S.ads.day!==t){S.ads.day=t;S.ads.tix=0}return Math.max(0,AD_TIX_DAY-S.ads.tix)}
+function adBoostOK(){return S.boosts.money-Date.now()<=AD_BOOST_MAX-AD_BOOST_MS}
+function giveAdBoost(){S.boosts.money=Math.min(Date.now()+AD_BOOST_MAX,Math.max(Date.now(),S.boosts.money)+AD_BOOST_MS);sfx.chest();toast('🍯 Dubbla pengar i 30 minuter!')}
+// offline-pengar läggs direkt på S.money (inte addMoney) så att de inte blåser upp intjäningstakten S.mps
+// en reklamknapp: lila med ▶, gråtonad medan reklamen laddar
+function adBtn(label,cb,sm){return h('button',{class:'btn ad ol'+(sm?' sm':'')+(Ads.ready()?'':' wait'),html:'<span class="play">▶</span>'+label,on:{click:()=>Ads.show(cb)}})}
+
 /* --- screens --- */
 function showChallengeIntro(){
   const boss=isBoss(),bi=biome();
@@ -2292,23 +2400,26 @@ function showVictory(){
   const r=reward();
   const nextWorld=isBoss()?S.world+1:S.world;
   const newReg=REG.find(x=>x.need===nextWorld&&isBoss());
-  const claim=()=>{S.gems+=r;missionAdd('wins',1);gainXP(isBoss()?15:5);closeModal();
+  const claim=(m=1)=>{S.gems+=r*m;missionAdd('wins',1);gainXP(isBoss()?15:5);closeModal();if(m>1)toast(`+${r*m} 💎 – dubbel belöning!`);
     S.sub++;if(S.sub>5){S.sub=1;S.world++}const before=slotCount();S.maxWorld=Math.max(S.maxWorld||1,S.world);save();transition(setupIdle);
     if(slotCount()>before)setTimeout(()=>toast('Ny plats i Gänget är upplåst! 🐻'),2600);
     if(newReg)setTimeout(()=>toast(`${newReg.icon} ${newReg.name} är upplåst!\nÖppna kartan och res dit.`),1300)};
   openModal({title:'SEGER!',avatar:wavingAvatar(),close:false,body:[
     h('div',{class:'panel'},h('div',{class:'k'},'Belöning'),h('div',{class:'big',html:gemHTML(r)}),
       h('div',{class:'note'},newReg?`Ny region på kartan: ${newReg.icon} ${newReg.name}!`:isBoss()?`Värld ${nextWorld} börjar!`:'Nästa nivå är upplåst.')),
-    h('div',{class:'btns'},h('button',{class:'btn green ol',on:{click:claim}},'Hämta'))
+    h('div',{class:'btns'},h('button',{class:'btn green ol',on:{click:()=>claim(1)}},'Hämta'),Ads.on()?adBtn('Hämta ×2',()=>claim(2)):null)
   ]});
 }
 function showLose(){
   sfx.lose();
   const ko=h('div',{style:'width:110px;height:110px;border-radius:26px;background:linear-gradient(#cfd6e0,#9aa6b8);border:3px solid #3a2814;display:grid;place-items:center;overflow:hidden'});
   ko.appendChild((()=>{const c=bearPreview(S.skin,null,100,{anim:'faint',frame:3,sc:.78});c.style.cssText='width:100px;height:100px';return c})());
+  const canRevive=Ads.on()&&!chal.revived&&trees.length>0;
+  const revive=()=>{if(mode!=='lost'||chal.revived)return;chal.revived=true;closeModal();chal.time=AD_REVIVE_S;mode='challenge';bullets=[];sfx.event();toast(`+${AD_REVIVE_S} sekunder – fäll resten!`)};
   openModal({title:'Tiden tog slut',ribbon:'red',avatar:ko,close:false,body:[
     h('div',{class:'panel'},h('div',{class:'big',style:'font-size:18px'},`${trees.length} av ${chal.total} träd stod kvar`),
-      h('div',{class:'note'},'Pengarna du samlade får du behålla. Uppgradera Kraft och Hastighet och försök igen.')),
+      h('div',{class:'note'},canRevive?`Titta på en kort reklam för ${AD_REVIVE_S} extra sekunder, eller försök igen. Pengarna du samlade behåller du.`:'Pengarna du samlade får du behålla. Uppgradera Kraft och Hastighet och försök igen.')),
+    canRevive?h('div',{class:'btns'},adBtn(`+${AD_REVIVE_S} sekunder`,revive)):null,
     h('div',{class:'btns'},
       h('button',{class:'btn grey',on:{click:()=>{closeModal();transition(setupIdle)}}},'Tillbaka'),
       h('button',{class:'btn',on:{click:()=>{closeModal();transition(()=>{setupIdle();setupChallenge()})}}},'Försök igen'))
@@ -2388,6 +2499,8 @@ function showShop(){
   openModal({title:'Butik',body:[
     itemRow(icon('🎁'),'Gratis gåva',gift?'Hämta 10 diamanter':`Ny gåva om ${Math.floor(giftLeft/3600000)} h ${Math.floor(giftLeft/60000)%60} min`,
       h('button',{class:'btn sm green',...(gift?{}:{disabled:''}),on:{click:()=>{S.gems+=10;S.giftAt=Date.now()+6*3600000;sfx.coin();save();showShop()}}},'Hämta')),
+    Ads.on()?itemRow(icon('📺'),'Gratis: dubbla pengar',adBoostOK()?'Titta på en kort reklam: alla pengar ×2 i 30 minuter. Kan sparas upp till 2 timmar.':'Du har redan max 2 timmar dubbla pengar.',
+      adBoostOK()?adBtn('Titta',()=>{giveAdBoost();if(modalOpen)showShop()},true):h('button',{class:'btn sm grey',disabled:''},'Fullt')):null,
     itemRow(icon('🍯'),'Dubbla pengar','Alla pengar ×2 i 3 minuter',h('button',{class:'btn sm',html:gemHTML(40),on:{click:buyBoost('money',40)}})),
     itemRow(icon('💥'),'Dubbel skada','All skada ×2 i 3 minuter',h('button',{class:'btn sm',html:gemHTML(40),on:{click:buyBoost('dmg',40)}})),
     itemRow(icon('💰'),'Pengasäck',`Få ${fmt(sack)} direkt`,h('button',{class:'btn sm',html:gemHTML(25),on:{click:()=>{if(S.gems<25)return toast('Du behöver fler diamanter');S.gems-=25;addMoney(sack);sfx.coin();save();showShop()}}})),
@@ -3116,6 +3229,8 @@ function showBonus(){
     dailyReady()?itemRow(icon('📅'),'Dagens belöning',`Dag ${dailyNext()} av 7 är redo att hämtas!`,h('button',{class:'btn sm green',on:{click:showDaily}},'Hämta')):
       itemRow(icon('📅'),'Dagens belöning',`Du har hämtat dag ${S.daily.day}. Kom tillbaka i morgon!`,h('button',{class:'btn sm grey',disabled:''},'Hämtad')),
     itemRow(wheelThumb(58),'Lyckohjulet',free?'En gratis snurr väntar! Vinn upp till 500 💎.':'Snurra och vinn diamanter, burkar och biljetter.',h('button',{class:'btn sm '+(free?'green':''),on:{click:showWheel}},free?'Gratis!':'Snurra')),
+    Ads.on()?(()=>{const n=adTixLeft();return itemRow(icon('📺'),'Gratis biljetter',n?`Titta på en kort reklam och få ${AD_TIX_N} 🎟️. ${n} kvar i dag.`:'Slut för i dag – nya i morgon!',
+      n?adBtn('Titta',()=>{if(adTixLeft()<=0)return;S.ads.tix++;S.tickets+=AD_TIX_N;sfx.chest();toast(`+${AD_TIX_N} 🎟️ biljetter!`);if(modalOpen)showBonus()},true):h('button',{class:'btn sm grey',disabled:''},'I morgon'))})():null,
     itemRow(icon('🎈'),'Ballongjakten',`Smäll så många ballonger du hinner på 25 sekunder. Rekord: ${S.best.balloons||0}`,h('button',{class:'btn sm',on:{click:playBalloons}},tk(1))),
     itemRow(icon('⛏️'),'Skattgrävningen','Gräv i sanden och hitta den gömda skattkistan med 7 spadtag.',h('button',{class:'btn sm',on:{click:playDig}},tk(1))),
     itemRow(icon('🎣'),'Fiskesjön',`Fiska med maskar (${S.worms}/${MAX_WORMS}).`,h('button',{class:'btn sm',on:{click:showFishing}},'Fiska')),
@@ -3135,11 +3250,13 @@ function showSettings(confirmReset){
       h('button',{class:'btn sm',on:{click:()=>{S.bearStyle=(S.bearStyle==='pixel')?'3d':'pixel';loadBearStyle(S.bearStyle);save();setTimeout(()=>showSettings(),120)}}},S.bearStyle==='pixel'?'Byt till 3D':'Byt till pixel')),
     h('div',{class:'item'},h('div',{class:'info'},h('div',{class:'nm'},'Musik'),h('div',{class:'ds'},S.music?'Musiken är på':'Musiken är av')),
       h('button',{class:'btn sm '+(S.music?'green':'grey'),on:{click:()=>{S.music=!S.music;if(S.music){audio();startMusic()}else stopMusic();save();showSettings()}}},S.music?'På':'Av')),
+    Ads.privacy()?h('div',{class:'item'},h('div',{class:'info'},h('div',{class:'nm'},'Reklam och integritet'),h('div',{class:'ds'},'Ändra ditt samtycke för reklam')),
+      h('button',{class:'btn sm',on:{click:()=>Ads.openPrivacy()}},'Ändra')):null,
     h('div',{class:'item'},h('div',{class:'info'},h('div',{class:'nm'},'Statistik'),h('div',{class:'ds'},`${fmt(S.stats.trees)} träd fällda · ${S.stats.chests} kistor · ${S.stats.events} händelser · ${S.stats.fish||0} fiskar · ${S.rebirths} återfödelser`))),
     confirmReset?h('div',{class:'panel'},h('div',{class:'nm',style:'font-weight:700'},'Radera allt och börja om?'),h('div',{class:'note'},'Det går inte att ångra.'),
       h('div',{class:'btns'},h('button',{class:'btn sm grey',on:{click:()=>showSettings()}},'Avbryt'),h('button',{class:'btn sm red',on:{click:()=>{endEvent(true);S=fresh();idleStash=null;save();closeModal();transition(setupIdle)}}},'Radera')))
     :h('div',{class:'btns'},h('button',{class:'btn sm red',on:{click:()=>showSettings(true)}},'Börja om från början')),
-    h('div',{class:'note'},'Spelet sparas automatiskt i den här webbläsaren. Styr med fingret eller WASD/piltangenter.')
+    h('div',{class:'note'},'Spelet sparas automatiskt på den här enheten. Styr med fingret eller WASD/piltangenter.')
   ]});
 }
 function showWelcomeBack(amount,secs){
@@ -3147,7 +3264,8 @@ function showWelcomeBack(amount,secs){
   openModal({title:'Välkommen tillbaka!',avatar:bearPreview(S.skin,S.gun,110),body:[
     h('div',{class:'panel'},h('div',{class:'note'},`Björnarna fortsatte jobba i ${hrs?hrs+' h ':''}${mins} min medan du var borta.`),
       h('div',{class:'big',html:`<span class="bill"></span> ${fmt(amount)}`})),
-    h('div',{class:'btns'},h('button',{class:'btn green ol',on:{click:()=>{addMoney(amount);closeModal();sfx.coin()}}},'Hämta'))
+    h('div',{class:'btns'},h('button',{class:'btn green ol',on:{click:()=>{S.money+=amount;closeModal();sfx.coin()}}},'Hämta'),
+      Ads.on()?adBtn('Hämta ×2',()=>{S.money+=amount*2;closeModal();sfx.chest();toast('Dubbla offline-pengar! 🍯')}):null)
   ],close:false});
 }
 
@@ -3165,6 +3283,7 @@ $('btnMission').addEventListener('click',showMissions);
 $('btnRebirth').addEventListener('click',showRebirth);
 $('btnSettings').addEventListener('click',()=>showSettings());
 $('mapBtn').addEventListener('click',showMap);
+$('adBoostBtn').addEventListener('click',()=>Ads.show(giveAdBoost));
 $('evoBtn').addEventListener('click',()=>{const st=S.evo.stage;if(st<3&&S.evo.xp>=EVO_NEED[st])showEvolve();else showEvo()});
 $('btnAuto').addEventListener('click',()=>{S.auto=!S.auto;toast(S.auto?'Autoköp på: billigaste uppgraderingen köps automatiskt':'Autoköp av');updateUI()});
 $('exitBtn').addEventListener('click',()=>{if(mode==='challenge'){mode='lost';transition(setupIdle)}});
@@ -3197,6 +3316,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
 function start(fromHot){
   if(running)return;running=true;
   resize();buildTrack();buildWorldDecor();setupIdle();updateUI();
+  Ads.init();
   if(!fromHot){
     const away=(Date.now()-(S.lastSeen||Date.now()))/1000;
     if(away>90&&S.mps>0){const secs=Math.min(away,3600);const amt=S.mps*secs*.25;if(amt>=1)showWelcomeBack(amt,secs)}

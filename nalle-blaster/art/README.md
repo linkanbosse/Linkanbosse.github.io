@@ -33,3 +33,9 @@ animationsbild. Därför mäts fästpunkterna i förväg:
 
 Spelet räknar fram hals och rygg ur hjässan, så att samma plagg sitter lika på båda
 björnstilarna. Filerna är inbakade i `../index.html`.
+
+## Appikonen (Android)
+
+- `render_logo.py` – renderar 3D-björnen som vinkar i 1024×1024 till `../logo.png`.
+  Körs med `python3 render_logo.py` (numpy, Pillow, scipy).
+- Android-bygget (`.github/workflows/nalle-blaster-android.yml`) gör appikoner, Play-ikon och startbild av `logo.png`.
