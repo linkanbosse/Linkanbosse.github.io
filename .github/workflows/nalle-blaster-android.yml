@@ -8,7 +8,12 @@
 #     Actions → körningen → Artifacts
 #
 # Inställningar i repot (Settings → Secrets and variables → Actions):
-#   • Variabel ADMOB_APP_ID      ditt AdMob App ID (ca-app-pub-…~…). Saknas den används Googles test-ID.
+#   • Variabel ADMOB_APP_ID      (valfri) ersätter App ID nedan, t.ex. om du byter AdMob-konto.
+#
+# Annonser:
+#   • Test-APK:n visar ALLTID Googles testannonser (spelets testing-flagga slås om vid bygget),
+#     så att du aldrig visar riktiga annonser för dig själv – det kan få ditt AdMob-konto avstängt.
+#   • Den signerade .aab:n för Google Play visar riktiga annonser från ditt annonsblock.
 #   • Hemlighet KEYSTORE_PASSWORD minst 12 tecken. Behövs först när du ska ladda upp till Google Play.
 #     Tappa aldrig bort den – den låser upp nyckeln som alla framtida uppdateringar signeras med.
 name: Nalle Blaster Android-app
@@ -29,7 +34,7 @@ concurrency:
 env:
   APP_ID: io.github.linkanbosse.nalleblaster   # appens unika ID på Google Play. Ändra aldrig efter första publiceringen.
   APP_NAME: Nalle Blaster
-  ADMOB_APP_ID: ${{ vars.ADMOB_APP_ID || 'ca-app-pub-3940256099942544~3347511713' }}
+  ADMOB_APP_ID: ${{ vars.ADMOB_APP_ID || 'ca-app-pub-1287369098390693~3655022513' }}
 
 jobs:
   android:
@@ -52,6 +57,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Kontrollera AdMob-ID:n
+        run: |
+          set -euo pipefail
+          UNIT=$(grep -o "rewardedId:'[^']*'" nalle-blaster/index.html | head -1 | cut -d"'" -f2)
+          echo "App ID: $ADMOB_APP_ID   Belöningsannons: $UNIT"
+          [[ "$ADMOB_APP_ID" =~ ^ca-app-pub-[0-9]{16}~[0-9]{10}$ ]] || { echo "::error::App ID ska se ut som ca-app-pub-…~… (med ~)"; exit 1; }
+          [[ "$UNIT" =~ ^ca-app-pub-[0-9]{16}/[0-9]{10}$ ]] || { echo "::error::rewardedId i index.html ska se ut som ca-app-pub-…/… (med /)"; exit 1; }
+          if [ "${UNIT%%/*}" != "${ADMOB_APP_ID%%~*}" ] && [ "${UNIT%%/*}" != "ca-app-pub-3940256099942544" ]; then
+            echo "::error::Annonsblocket och App ID kommer från olika AdMob-konton"; exit 1
+          fi
 
       - name: Skapa Capacitor-projekt
         run: |
@@ -325,6 +341,10 @@ jobs:
           NALLE_DEBUG_KEYSTORE: ${{ github.workspace }}/.github/keys/nalle-blaster/debug.keystore
         run: |
           set -euo pipefail
+          # test-APK:n ska bara visa testannonser
+          WEB=app/android/app/src/main/assets/public/index.html
+          sed -i 's/testing:false,/testing:true,/' "$WEB"
+          grep -q "testing:true," "$WEB" || { echo "::error::Kunde inte slå på testannonser i test-APK:n"; exit 1; }
           cd app/android
           chmod +x gradlew
           ./gradlew --no-daemon assembleDebug
@@ -361,6 +381,8 @@ jobs:
             git pull --rebase origin "$GITHUB_REF_NAME"
             git push origin "HEAD:$GITHUB_REF_NAME"
           fi
+          # Play-versionen: riktiga annonser (spelets egen inställning)
+          cp app/www/index.html app/android/app/src/main/assets/public/index.html
           cd app/android
           ./gradlew --no-daemon bundleRelease
           AAB=app/build/outputs/bundle/release/app-release.aab
@@ -383,4 +405,4 @@ jobs:
           gh release delete nalle-blaster-test --yes --cleanup-tag 2>/dev/null || true
           gh release create nalle-blaster-test out/nalle-blaster-test.apk --prerelease --target "$GITHUB_SHA" \
             --title "Nalle Blaster – test-APK (bygge $GITHUB_RUN_NUMBER)" \
-            --notes "Ladda ner nalle-blaster-test.apk på telefonen och installera den. Visar testannonser tills du bytt till dina egna AdMob-ID:n."
+            --notes "Ladda ner nalle-blaster-test.apk på telefonen och installera den. Test-APK:n visar alltid Googles testannonser – riktiga annonser finns bara i Google Play-versionen."
